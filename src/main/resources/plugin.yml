@@ -306,7 +306,7 @@ permissions:
     children:
       system.clan.use: true
   clan.delete.confirm.bypass:
-    description: Bypasses the confirmation for /clan delete.
+    description: Bypasses the 60-second expiry after /clan delete; a pending request is still required.
     default: false
   system.customcmd.admin:
     description: Allows managing custom commands created with create-cmd's (/customcmd).

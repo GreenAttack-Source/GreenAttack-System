@@ -1180,11 +1180,6 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
 
       UUID playerId = player.getUniqueId();
       if (args.length == 1) {
-         if (player.hasPermission(DELETE_CONFIRM_BYPASS_PERMISSION)) {
-            this.pendingDeleteConfirmations.remove(playerId);
-            this.disband(player);
-            return;
-         }
          ClanData clan = this.snapshot.clans.get(me.clanKey);
          this.pendingDeleteConfirmations.put(playerId,
             new PendingDeleteConfirmation(me.clanKey, System.currentTimeMillis() + DELETE_CONFIRM_TIMEOUT_MILLIS));
@@ -1218,8 +1213,9 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
 
       UUID playerId = player.getUniqueId();
       PendingDeleteConfirmation pending = this.pendingDeleteConfirmations.remove(playerId);
-      boolean bypass = player.hasPermission(DELETE_CONFIRM_BYPASS_PERMISSION);
-      if (!bypass && (pending == null || pending.expiresAt() < System.currentTimeMillis() || !pending.clanKey().equals(me.clanKey))) {
+      boolean bypassExpiry = player.hasPermission(DELETE_CONFIRM_BYPASS_PERMISSION);
+      if (pending == null || !pending.clanKey().equals(me.clanKey)
+         || (!bypassExpiry && pending.expiresAt() <= System.currentTimeMillis())) {
          this.tell(sender, "messages.delete-confirm-expired", "&cEs gibt keine gültige Löschbestätigung. Starte mit &f/clan delete&c.");
          return;
       }
@@ -2472,7 +2468,8 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
             options.addAll(Arrays.asList("menu", "create", "invite", "accept", "deny", "join", "leave", "delete", "info", "list", "top", "members", "chat", "kick", "setrole", "roles",
                "role", "color", "rename", "settag", "settings", "home", "sethome", "delhome", "homes", "transfer", "help"));
             PendingDeleteConfirmation pending = this.pendingDeleteConfirmations.get(player.getUniqueId());
-            if (me == null || !ClanModel.OWNER.equals(me.roleKey) || pending == null || pending.expiresAt() < System.currentTimeMillis()) {
+            if (me == null || !ClanModel.OWNER.equals(me.roleKey) || pending == null || !pending.clanKey().equals(me.clanKey)
+               || (!player.hasPermission(DELETE_CONFIRM_BYPASS_PERMISSION) && pending.expiresAt() <= System.currentTimeMillis())) {
                options.remove("confirm");
             } else {
                options.add("confirm");
