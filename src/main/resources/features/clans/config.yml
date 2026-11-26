@@ -111,7 +111,7 @@ messages:
   db-error: "&cDie Clan-Datenbank ist gerade nicht erreichbar. Es wurde nichts abgebucht. Bitte melde das einem Admin."
   db-not-configured: "&cDas Clan-System braucht eine Datenbank. Bitte database.enabled in features/clans/config.yml aktivieren."
   disabled: "&cDas Clan-System ist derzeit deaktiviert."
-  delete-confirm: "&cBist du wirklich sicher, dass du den Clan &e%clan% &clöschen möchtest? Bestätige innerhalb von 60 Sekunden mit &f/clan delete confirm&c."
+  delete-confirm: "&cBist du wirklich sicher, dass du den Clan &e%clan% &clöschen möchtest? Bestätige innerhalb von 60 Sekunden mit &f/clan confirm&c."
   delete-confirm-expired: "&cEs gibt keine gültige Löschbestätigung. Starte mit &f/clan delete&c."
   deleted: "&aDer Clan &e%clan% &awurde gelöscht."
   owner-delete-required: "&cDer Clan-Leader kann nicht austreten. Übertrage die Leitung mit &f/clan transfer <Spieler> &coder lösche den Clan mit &f/clan delete&c."

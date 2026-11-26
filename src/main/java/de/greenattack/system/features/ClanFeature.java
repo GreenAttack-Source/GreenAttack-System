@@ -609,6 +609,9 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          case "delete":
             this.handleDelete(sender, args);
             break;
+         case "confirm":
+            this.handleDeleteConfirm(sender, args);
+            break;
          case "info":
             this.handleInfo(sender, args);
             break;
@@ -730,7 +733,8 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
       for (String line : new String[] {
          "&f/clan &7- Clan-Menü", "&f/clan create <Name> <Tag> &7- Clan gründen", "&f/clan invite <Spieler> &7| &f/clan accept &7| &f/clan deny",
          "&f/clan join <Clan> &7- offenem Clan beitreten", "&f/clan leave &7- Clan verlassen (nicht als Owner)",
-         "&f/clan delete [confirm] &7- eigenen Clan löschen (nur Owner)", "&f/clan info [Clan] &7| &f/clan members",
+         "&f/clan delete &7- Löschbestätigung anfordern (nur Owner)", "&f/clan confirm &7- Clan endgültig löschen",
+         "&f/clan info [Clan] &7| &f/clan members",
          "&f/clan list &7| &f/clan top", "&f/clan chat [Nachricht] &7| &f/cc <Nachricht>", "&f/clan kick <Spieler> &7| &f/clan setrole <Spieler> <Rolle>",
          "&f/clan roles &7| &f/clan role <create|delete|weight|perm|info> ...", "&f/clan home [Name] &7| &f/clan sethome|delhome <Name> &7| &f/clan homes",
          "&f/clan color <Farbe> &7| &f/clan rename <Name> &7| &f/clan settag <Tag>", "&f/clan settings join <invite|close|open>",
@@ -1185,21 +1189,41 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          this.pendingDeleteConfirmations.put(playerId,
             new PendingDeleteConfirmation(me.clanKey, System.currentTimeMillis() + DELETE_CONFIRM_TIMEOUT_MILLIS));
          this.tell(sender, "messages.delete-confirm",
-            "&cBist du wirklich sicher, dass du den Clan &e%clan% &clöschen möchtest? Bestätige innerhalb von 60 Sekunden mit &f/clan delete confirm&c.",
+            "&cBist du wirklich sicher, dass du den Clan &e%clan% &clöschen möchtest? Bestätige innerhalb von 60 Sekunden mit &f/clan confirm&c.",
             "clan", clan == null ? me.clanKey : clan.name);
          return;
       }
-      if (args.length == 2 && args[1].equalsIgnoreCase("confirm")) {
-         PendingDeleteConfirmation pending = this.pendingDeleteConfirmations.remove(playerId);
-         boolean bypass = player.hasPermission(DELETE_CONFIRM_BYPASS_PERMISSION);
-         if (!bypass && (pending == null || pending.expiresAt() < System.currentTimeMillis() || !pending.clanKey().equals(me.clanKey))) {
-            this.tell(sender, "messages.delete-confirm-expired", "&cEs gibt keine gültige Löschbestätigung. Starte mit &f/clan delete&c.");
-            return;
-         }
-         this.disband(player);
+      this.tell(sender, "messages.usage-generic", "&7Verwendung: &f/clan %usage%", "usage", "delete");
+   }
+
+   private void handleDeleteConfirm(CommandSender sender, String[] args) {
+      Player player = this.requirePlayer(sender);
+      if (player == null) {
          return;
       }
-      this.tell(sender, "messages.usage-generic", "&7Verwendung: &f/clan %usage%", "usage", "delete [confirm]");
+      if (args.length != 1) {
+         this.tell(sender, "messages.usage-generic", "&7Verwendung: &f/clan %usage%", "usage", "confirm");
+         return;
+      }
+
+      MemberData me = this.snapshot.members.get(player.getUniqueId());
+      if (me == null) {
+         this.tell(sender, "messages.not-in-clan", "&cDu bist in keinem Clan.");
+         return;
+      }
+      if (!ClanModel.OWNER.equals(me.roleKey)) {
+         this.tell(sender, "messages.no-rights", "&cDazu hast du im Clan keine Rechte.");
+         return;
+      }
+
+      UUID playerId = player.getUniqueId();
+      PendingDeleteConfirmation pending = this.pendingDeleteConfirmations.remove(playerId);
+      boolean bypass = player.hasPermission(DELETE_CONFIRM_BYPASS_PERMISSION);
+      if (!bypass && (pending == null || pending.expiresAt() < System.currentTimeMillis() || !pending.clanKey().equals(me.clanKey))) {
+         this.tell(sender, "messages.delete-confirm-expired", "&cEs gibt keine gültige Löschbestätigung. Starte mit &f/clan delete&c.");
+         return;
+      }
+      this.disband(player);
    }
 
    void disband(Player player) {
@@ -2447,6 +2471,12 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          if (args.length == 1) {
             options.addAll(Arrays.asList("menu", "create", "invite", "accept", "deny", "join", "leave", "delete", "info", "list", "top", "members", "chat", "kick", "setrole", "roles",
                "role", "color", "rename", "settag", "settings", "home", "sethome", "delhome", "homes", "transfer", "help"));
+            PendingDeleteConfirmation pending = this.pendingDeleteConfirmations.get(player.getUniqueId());
+            if (me == null || !ClanModel.OWNER.equals(me.roleKey) || pending == null || pending.expiresAt() < System.currentTimeMillis()) {
+               options.remove("confirm");
+            } else {
+               options.add("confirm");
+            }
          } else if (args.length == 2) {
             switch (args[0].toLowerCase(Locale.ROOT)) {
                case "invite":
@@ -2481,11 +2511,6 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
                   break;
                case "settings":
                   options.add("join");
-                  break;
-               case "delete":
-                  if (me != null && ClanModel.OWNER.equals(me.roleKey)) {
-                     options.add("confirm");
-                  }
                   break;
                case "home":
                case "delhome":
