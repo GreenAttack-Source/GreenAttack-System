@@ -1,0 +1,99 @@
+enabled: true
+
+permissions:
+  use: "system.booster.use"
+  admin: "system.booster.admin"
+
+# Dauer pro Aktivierung; eine weitere Aktivierung verlängert den laufenden Booster.
+duration-seconds: 900
+
+# Der Fly Booster bleibt für später in der Konfiguration, ist aber derzeit deaktiviert.
+categories:
+  fly-booster:
+    enabled: false
+
+effects:
+  bonus-xp: 3
+  break-effect-seconds: 2
+  break-haste-level: 2
+  break-speed-level: 2
+  drop-multiplier: 2
+  drop-pickaxes:
+    - IRON_PICKAXE
+    - DIAMOND_PICKAXE
+    - NETHERITE_PICKAXE
+
+sounds:
+  activation: true
+
+gui:
+  title: "&a&lGreenAttack &8» &7&lBooster"
+  status-active: "&aAktiv (&e%seconds%s&a)"
+  status-inactive: "&cInaktiv"
+  click-active: "&eKlicke zum Aktivieren!"
+  click-empty: "&cDu besitzt keinen Booster!"
+  items:
+    fly:
+      material: FEATHER
+      name: "&a&lFly Booster"
+      lore:
+        - "&7Aktiviert zeitweises Fliegen"
+        - "&7für alle Spieler auf dem Server."
+        - ""
+        - "&8» &7Status: %status%"
+        - "&8» &7Dein Vorrat: &e%count%"
+        - ""
+        - "%click%"
+    break:
+      material: GOLDEN_PICKAXE
+      name: "&e&lAbbau Booster"
+      lore:
+        - "&7Gibt allen Spielern Eile II"
+        - "&7und Schnelligkeit II."
+        - ""
+        - "&8» &7Status: %status%"
+        - "&8» &7Dein Vorrat: &e%count%"
+        - ""
+        - "%click%"
+    drop:
+      material: DIAMOND_ORE
+      name: "&b&lDrop Booster"
+      lore:
+        - "&7Verdoppelt abgebaute Erze"
+        - "&7und seltene Ressourcen."
+        - ""
+        - "&8» &7Status: %status%"
+        - "&8» &7Dein Vorrat: &e%count%"
+        - ""
+        - "%click%"
+    xp:
+      material: EXPERIENCE_BOTTLE
+      name: "&d&lXP Booster"
+      lore:
+        - "&7Gibt zusätzliche Erfahrung"
+        - "&7beim Abbau von Erzen."
+        - ""
+        - "&8» &7Status: %status%"
+        - "&8» &7Dein Vorrat: &e%count%"
+        - ""
+        - "%click%"
+
+# Diese Werte werden vom Feature gespeichert. Lass sie für den laufenden Betrieb stehen.
+storage:
+  counts: {}
+  active-until: {}
+
+messages:
+  disabled: "&cDieses Feature ist deaktiviert."
+  no-permission: "&cDazu hast du keine Rechte."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  give-usage: "&7Verwendung: &f/boostergive <Spieler> <break|drop|xp> <Anzahl>"
+  player-not-found: "&cSpieler &e%player% &cwurde nicht gefunden."
+  invalid-type: "&cGültige Typen: %types%"
+  invalid-amount: "&cBitte gib eine positive ganze Zahl an."
+  given: "&7Du hast &f%player% &e%amount%x %type%-Booster &7gegeben!"
+  received: "&7Du hast &e%amount%x %type%-Booster &7erhalten! &8(/booster)"
+  empty: "&cDu hast keine %type%-Booster im Vorrat!"
+  activated: "&f%player% &7hat einen %booster%-Booster für &e%duration% &7aktiviert!"
+  extended: "&f%player% &7hat den %booster%-Booster um &e%duration% &7verlängert!"
+  expired: "&7Der %booster%-Booster ist abgelaufen."

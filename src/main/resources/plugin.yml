@@ -1,0 +1,875 @@
+name: GreenAttack-System
+version: '${version}'
+main: de.greenattack.system.GreenAttackSystemPlugin
+api-version: '1.21'
+description: GreenAttack utility features and permission-based full-server join bypass.
+author: GreenAttack
+softdepend: [LuckPerms, Vault, Essentials, EssentialsSpawn, PlaceholderAPI, NBTAPI]
+libraries:
+  - com.mysql:mysql-connector-j:8.4.0
+  - org.mariadb.jdbc:mariadb-java-client:3.5.3
+commands:
+  greenattack:
+    description: Serverweite Admin-Befehle des GreenAttack-Systems.
+    usage: /greenattack <reload|slots <anzahl>>
+    permission: system.admin
+    permission-message: "Dafür hast du keine Berechtigung."
+  slots:
+    description: Ändert das Spielerlimit dieses Paper-Servers.
+    usage: /slots <anzahl>
+    permission: system.admin
+    permission-message: "Dafür hast du keine Berechtigung."
+  isign:
+    description: Signiert das Item in deiner Hand.
+    usage: /isign [Spieler]
+  news:
+    description: Zeigt die GreenAttack-Neuigkeiten.
+    aliases: [updates]
+    usage: /news
+  newsconfig:
+    description: Verwaltet die GreenAttack-Neuigkeiten.
+    usage: /newsconfig <add|delete|clear>
+  tpa:
+    description: Sendet eine Teleport-Anfrage.
+    usage: /tpa <Spieler>
+  tpaaccept:
+    description: Nimmt eine Teleport-Anfrage an.
+    usage: /tpaaccept
+  tpacancel:
+    description: Lehnt eine Teleport-Anfrage ab.
+    usage: /tpacancel
+  tpaauto:
+    description: Schaltet das automatische Annehmen von TPA-Anfragen um.
+    usage: /tpaauto
+  tpalookup:
+    description: Zeigt die letzten TPA- und TP-Teleports an.
+    usage: /tpalookup
+  tpahere:
+    description: Bittet einen Spieler, sich zu dir zu teleportieren.
+    aliases: [tpah]
+    usage: /tpahere <Spieler>
+  tphere:
+    description: Teleportiert einen Spieler zu dir.
+    aliases: [tph]
+    usage: /tphere <Spieler>
+  tp:
+    description: Teleportiert dich zu einem Spieler oder einen Spieler zu einem anderen.
+    aliases: [gctp]
+    usage: /tp <Spieler> [Zielspieler]
+  db:
+    description: Öffnet die Item-Datenbank.
+    usage: /db [hand]
+  halloween:
+    description: Verwaltet das Halloween-Kopf-Event.
+    usage: /halloween [set [skull]|reset]
+  monitoring:
+    description: Schaltet das Actionbar-Monitoring um oder ändert das Layout.
+    aliases: [mon]
+    usage: /monitoring [help|off|reset|elemente]
+  performance:
+    description: Schaltet den globalen Performance-Anzeigemodus um.
+    aliases: [perf]
+    usage: /performance
+  booster:
+    description: Öffnet das GreenAttack-Booster-Menü.
+    aliases: [boosters]
+    usage: /booster
+  boostergive:
+    description: Gibt einem Spieler Booster.
+    usage: /boostergive <Spieler> <break|drop|xp> <Anzahl>
+  one-klick:
+    description: Aktiviert One-Klick auf der gehaltenen Axt oder Spitzhacke.
+    usage: /one-klick
+    aliases: [oneclick]
+  gamemode:
+    description: Ändert den eigenen Spielmodus oder mit Berechtigung den eines Spielers.
+    usage: /gamemode <survival|creative|adventure|spectator> [Spieler]
+    aliases: [gm, gms, gmc, gma, gmsp, gm0, gm1, gm2, gm3]
+  fly:
+    description: Schaltet persönliches Fliegen um oder verwaltet es für Spieler.
+    usage: /fly [Spieler]
+  msg:
+    description: Sendet eine private Nachricht an einen Spieler auf diesem Server.
+    aliases: [tell, w, whisper]
+    usage: /msg <Spieler> <Nachricht>
+  msglogs:
+    description: Zeigt die gespeicherten privaten Nachrichten.
+    usage: /msglogs [Seite]
+  invsee:
+    description: Öffnet das Inventar eines Spielers (offline über OpenInv).
+    aliases: [inv]
+    usage: /inv <Spieler>
+  ecsee:
+    description: Öffnet die Endertruhe eines Spielers (offline über OpenInv).
+    usage: /ecsee <Spieler>
+  ec:
+    description: Öffnet deine eigene Endertruhe.
+    usage: /ec
+  spawn:
+    description: Teleportiert dich oder einen Spieler zum Spawn.
+    usage: /spawn [Spieler]
+    aliases: [espawn]
+  rtp:
+    description: Teleportiert dich an einen sicheren Zufallsort in deiner aktuellen Welt.
+    usage: /rtp
+    permission: system.rtp
+    permission-message: "Dafür hast du keine Berechtigung."
+  market:
+    description: Öffnet den dynamischen GreenAttack-Markt mit Kategorien.
+    aliases: [markt]
+    usage: /markt [reload|reset [Kategorie]]
+    permission: system.market.use
+    permission-message: "Dafür hast du keine Berechtigung."
+  setspawn:
+    description: Setzt den Standard- oder einen Gruppenspawn.
+    usage: /setspawn [Gruppe]
+    aliases: [esetspawn]
+  haupt-world:
+    description: Setzt die aktuelle Welt als Server-Hauptwelt für den nächsten Neustart.
+    usage: /haupt-world
+  pay:
+    description: Sendet Geld an einen Spieler auf diesem Paper-Server.
+    usage: /pay <Spieler> <Betrag|1k|1m>
+  payinfo:
+    description: Zeigt die letzten lokalen Economy-Zahlungen.
+    usage: /payinfo [Anzahl]
+  eco:
+    description: Verwaltet die GreenAttack-Guthaben.
+    usage: /eco <give|take|set|reset|balance> <Spieler> [Betrag|1k|1m]
+  balance:
+    description: Zeigt dein GreenAttack-Guthaben.
+    usage: /balance [Spieler]
+    aliases: [bal]
+  balancetop:
+    description: Zeigt die höchsten GreenAttack-Guthaben.
+    usage: /balancetop
+    aliases: [baltop]
+  sell:
+    description: Öffnet ein Menü zum Verkaufen ausgewählter Items.
+    usage: /sell
+    permission: system.sell
+    permission-message: "Dafür hast du keine Berechtigung."
+  rank:
+    description: Öffnet den Rangmarkt für Natur, Premium und Titan.
+    aliases: [ränge]
+    usage: /rank [reload]
+    permission: system.rank.use
+    permission-message: "Dafür hast du keine Berechtigung."
+  kit:
+    description: Speichert das Starterkit für neue Spieler.
+    usage: /kit set
+    permission: system.kit.admin
+    permission-message: "Dafür hast du keine Berechtigung."
+  playtime:
+    description: Zeigt die eigene oder mit Admin-Berechtigung die Spielzeit eines Spielers.
+    aliases: [pt]
+    usage: /playtime [Spieler]
+  aktionshaus:
+    description: Öffnet das Aktionshaus und verwaltet Angebote.
+    aliases: [ah]
+    usage: /aktionshaus [suche|verkaufen|meine|abbrechen|admin|reload]
+  ka:
+    description: Verwaltet Kristallkonten.
+    usage: /ka <give|set|take> <Spieler> <Anzahl|1k|1m> | /ka reset <Spieler>
+  kristall:
+    description: Verwaltet Kristallkonten.
+    usage: /kristall <give|set|take> <Spieler> <Anzahl|1k|1m> | /kristall reset <Spieler>
+  kristalle:
+    description: Verwaltet Kristallkonten.
+    usage: /kristalle <give|set|take> <Spieler> <Anzahl|1k|1m> | /kristalle reset <Spieler>
+  home:
+    description: Listet Homes auf oder teleportiert zu einem Home.
+    usage: /home [name]
+    aliases: [h]
+  sethome:
+    description: Speichert ein Home.
+    usage: /sethome [name]
+    aliases: [seth]
+  delhome:
+    description: Löscht ein Home.
+    usage: /delhome [name]
+    aliases: [delh]
+  renamehome:
+    description: Benennt ein Home um.
+    usage: /renamehome <alt> <neu>
+    aliases: [rh]
+  homeadmin:
+    description: Teleportiert einen Administrator zu einem fremden Home.
+    usage: /homeadmin [set|remove] <Spieler> [Home]
+
+  code:
+    description: Löst einen Code ein (nur ein Code pro Spieler).
+    usage: /code <Code>
+  codecreate:
+    description: Erstellt einen neuen Code, optional mit Belohnungs-Befehl.
+    usage: /codecreate <Code> [Belohnungs-Befehl]
+  codeconfig:
+    description: Zeigt, fügt hinzu, entfernt oder ändert die Belohnungen eines Codes.
+    usage: /codeconfig <Code> [add|remove|set] ...
+  codereset:
+    description: Setzt den eingelösten Code eines Spielers zurück (zum Testen).
+    usage: /codereset <Spieler>
+  codedelete:
+    description: Löscht einen Code.
+    usage: /codedelete <Code>
+  codetop:
+    description: Zeigt die meistgenutzten Codes.
+    usage: /codetop
+  clan:
+    description: Clan-System (erstellen, einladen, Chat, Farbe ...).
+    usage: /clan help
+  clanadmin:
+    description: Clan-Verwaltung für Admins.
+    usage: /clanadmin <disband|kick|settag|setcolor> ...
+  cc:
+    description: Schreibt eine Nachricht an deinen Clan.
+    usage: /cc <Nachricht>
+  customcmd:
+    description: Verwaltet die eigenen Befehle aus create-cmd's.
+    usage: /customcmd <list|reload|create|delete>
+permissions:
+  system.admin:
+    description: Administrative Vollberechtigung für alle GreenAttack-System-Funktionen.
+    default: false
+    children:
+      system.isign: true
+      system.isign.admin: true
+      system.news.view: true
+      system.news.config: true
+      system.tpa.admin: true
+      system.tp: true
+      system.tp.here: true
+      system.tpa.here: true
+      system.db.admin: true
+      system.halloween.admin: true
+      system.monitoring.admin: true
+      system.monitoring.use: true
+      system.booster.use: true
+      system.booster.admin: true
+      system.pay.admin: true
+      system.eco: true
+      system.eco.balance: true
+      system.oneclick.admin: true
+      system.gamemode.admin: true
+      system.fly: true
+      system.fly.use: true
+      system.fly.admin: true
+      system.fly.other: true
+      system.msg.use: true
+      system.msg.see: true
+      system.spawn.admin: true
+      system.aktionshaus.admin: true
+      system.kristall.admin: true
+      kristallsystem.admin: true
+      system.home.admin: true
+      system.playtime.admin: true
+      system.kit.admin: true
+      system.code.use: true
+      system.code.top: true
+      system.code.admin: true
+      system.clan.use: true
+      system.clan.create: true
+      system.clan.color: true
+      system.clan.admin: true
+      system.customcmd.admin: true
+      system.anticheat.alerts: true
+  system.anticheat.alerts:
+    description: Receives alerts when players break ore blocks without a clear line of sight.
+    default: false
+  system.kit.admin:
+    description: Allows setting the GreenAttack starter kit with /kit set.
+    default: false
+  system.code.use:
+    description: Allows redeeming one code per player with /code.
+    default: false
+  system.code.top:
+    description: Allows viewing the most used codes with /codetop.
+    default: false
+  system.code.admin:
+    description: Allows creating, configuring, deleting and resetting codes with /codecreate, /codeconfig, /codedelete and /codereset.
+    default: false
+    children:
+      system.code.use: true
+      system.code.top: true
+  system.clan.use:
+    description: Allows using the clan commands (/clan, /cc).
+    default: false
+  system.clan.create:
+    description: Allows creating a clan with /clan create.
+    default: false
+  system.clan.color:
+    description: Allows changing the clan tag color with /clan color.
+    default: false
+  system.clan.admin:
+    description: Allows clan administration with /clanadmin.
+    default: false
+    children:
+      system.clan.use: true
+  clan.delete.confirm.bypass:
+    description: Bypasses the confirmation for /clan delete.
+    default: false
+  system.customcmd.admin:
+    description: Allows managing custom commands created with create-cmd's (/customcmd).
+    default: false
+  system.db.use:
+    description: Allows opening the item database and taking items.
+    default: false
+  system.db.add:
+    description: Allows adding the held item to the item database.
+    default: false
+    children:
+      system.db.use: true
+  system.db.admin:
+    description: Allows deleting items from the item database.
+    default: false
+    children:
+      system.db.use: true
+      system.db.add: true
+  system.halloween.user:
+    description: Allows viewing progress and collecting Halloween heads.
+    default: false
+  system.halloween.set:
+    description: Allows setting the Halloween skull template and receiving event heads.
+    default: false
+  system.halloween.reset:
+    description: Allows resetting the Halloween event with /halloween reset.
+    default: false
+  system.halloween.admin:
+    description: Allows all Halloween event actions.
+    default: false
+    children:
+      system.halloween.user: true
+      system.halloween.set: true
+      system.halloween.reset: true
+  system.monitoring.use:
+    description: Allows using /monitoring.
+    default: false
+  system.monitoring.admin:
+    description: Allows toggling the global monitoring display mode.
+    default: false
+    children:
+      system.monitoring.use: true
+  system.booster.use:
+    description: Allows opening and using the GreenAttack booster menu.
+    default: false
+  system.booster.admin:
+    description: Allows giving boosters to players.
+    default: false
+    children:
+      system.booster.use: true
+  system.oneclick.admin:
+    description: Allows marking an axe or pickaxe for One-Klick.
+    default: op
+  system.fly:
+    description: Legacy permission for personal flight; kept for compatibility.
+    default: false
+    children:
+      system.fly.use: true
+  system.fly.use:
+    description: Allows toggling personal flight in survival and adventure mode with /fly.
+    default: false
+  system.fly.other:
+    description: Allows toggling flight for another online player with /fly <player>.
+    default: false
+  system.fly.admin:
+    description: Allows using /fly and managing flight for other players.
+    default: false
+    children:
+      system.fly: true
+      system.fly.use: true
+      system.fly.other: true
+  system.msg.use:
+    description: Allows sending private messages with /msg.
+    default: false
+  system.msg.see:
+    description: Allows viewing private message logs with /msglogs.
+    default: false
+  system.invsee:
+    description: Allows viewing another online player's inventory with /inv and /invsee.
+    default: false
+  system.invsee.modify:
+    description: Allows modifying the inventory opened with /invsee.
+    default: false
+  system.ecsee:
+    description: Allows viewing another online player's ender chest with /ecsee.
+    default: false
+  system.ecsee.modify:
+    description: Allows modifying the ender chest opened with /ecsee.
+    default: false
+  system.ec:
+    description: Allows opening your own ender chest with /ec.
+    default: false
+  system.spawn:
+    description: Allows teleporting yourself to your group spawn with /spawn.
+    default: true
+  system.rtp:
+    description: Allows using /rtp to travel to a safe random location.
+    default: true
+  system.spawn.others:
+    description: Allows teleporting other online players to their group spawn.
+    default: false
+    children:
+      system.spawn: true
+  system.spawn.set:
+    description: Allows setting the default spawn with /setspawn.
+    default: op
+  system.spawn.set.group:
+    description: Allows setting group-specific spawn points.
+    default: op
+    children:
+      system.spawn.set: true
+  system.spawn.group.*:
+    description: Allows using every configured group-specific spawn.
+    default: false
+  system.spawn.admin:
+    description: Allows all GreenAttack spawn commands and keeps the last location on join.
+    default: op
+    children:
+      system.spawn: true
+      system.spawn.others: true
+      system.spawn.set: true
+      system.spawn.set.group: true
+  system.gamemode:
+    description: Allows using /gamemode to change your own game mode.
+    default: false
+  system.gamemode.survival:
+    description: Allows switching your own game mode to survival.
+    default: false
+  system.gamemode.creative:
+    description: Allows switching your own game mode to creative.
+    default: false
+  system.gamemode.adventure:
+    description: Allows switching your own game mode to adventure.
+    default: false
+  system.gamemode.spectator:
+    description: Allows switching your own game mode to spectator.
+    default: false
+  system.gamemode.other:
+    description: Allows targeting another online player with gamemode commands.
+    default: false
+  system.gamemode.admin:
+    description: Allows all GreenAttack gamemode commands for self and other players.
+    default: op
+    children:
+      system.gamemode: true
+      system.gamemode.survival: true
+      system.gamemode.creative: true
+      system.gamemode.adventure: true
+      system.gamemode.spectator: true
+      system.gamemode.other: true
+  system.pay:
+    description: Allows sending money to online players on this Paper server.
+    default: false
+  system.pay.admin:
+    description: Allows viewing the local payment log with /payinfo.
+    default: op
+    children:
+      system.pay: true
+  system.eco:
+    description: Allows managing GreenAttack balances with /eco.
+    default: op
+  system.eco.balance:
+    description: Allows viewing balances and the balance leaderboard.
+    default: true
+  system.sell:
+    description: Allows selling sellable inventory items with /sell.
+    default: false
+  system.market.use:
+    description: Allows buying and selling items through the category market.
+    default: true
+  system.market.admin:
+    description: Allows reloading the market and resetting dynamic stock.
+    default: false
+    children:
+      system.market.use: true
+  system.rank:
+    description: Allows managing the rank market and includes rank purchasing.
+    default: false
+    children:
+      system.rank.use: true
+  system.rank.use:
+    description: Allows opening the rank market and purchasing ranks with crystals.
+    default: false
+  system.playtime.admin:
+    description: Allows viewing another player's network-wide playtime.
+    default: false
+    children:
+      system.playtime.use: true
+  system.playtime.use:
+    description: Allows viewing one's own network-wide playtime with /playtime or /pt.
+    default: false
+  system.aktionshaus.use:
+    description: Allows using the GreenAttack auction house.
+    default: false
+  system.aktionshaus.admin:
+    description: Allows administration of the GreenAttack auction house.
+    default: op
+    children:
+      system.aktionshaus.use: true
+  system.kristall.admin:
+    description: Allows administering player Kristall balances.
+    default: op
+  kristallsystem.admin:
+    description: Legacy permission for the former KristallSystem plugin.
+    default: op
+  system.playerlimitbreak:
+    description: Allows joining a full server while resource usage is below the configured limits.
+    default: false
+  system.playerlimitbreak.admin:
+    description: Allows joining a full server regardless of the configured CPU and memory limits.
+    default: false
+  system.mysqlplayerbridge.admin:
+    description: Allows administration of the cross-server player data bridge.
+    default: false
+  system.isign:
+    description: Allows using /isign.
+    default: op
+  system.isign.admin:
+    description: Allows signing an item on behalf of another player.
+    default: op
+    children:
+      system.isign: true
+  system.isgn.admin:
+    description: Legacy spelling retained for existing permissions.
+    default: op
+  system.news.view:
+    description: Allows viewing news.
+    default: op
+  system.news.config:
+    description: Allows editing news.
+    default: op
+  system.tpa:
+    description: Allows sending TPA requests and accepting or cancelling them with /tpaaccept and /tpacancel.
+    default: false
+  system.tpa.auto:
+    description: Allows toggling automatic acceptance with /tpaauto.
+    default: false
+  system.tpa.here:
+    description: Allows sending requests that teleport another player to you with /tpahere.
+    default: false
+  system.tpa.admin:
+    description: Allows /tpalookup and includes all system.tpa permissions.
+    default: op
+    children:
+      system.tpa: true
+      system.tpa.auto: true
+      system.tpa.here: true
+  system.tp:
+    description: Allows teleporting yourself or another player with /tp.
+    default: false
+  system.tp.here:
+    description: Allows teleporting another player to you with /tphere.
+    default: false
+  system.home:
+    description: Allows listing and teleporting to saved homes.
+    default: false
+  system.home.set:
+    description: Allows setting, deleting, and renaming homes.
+    default: false
+  system.home.admin:
+    description: Allows teleporting to other players' homes.
+    default: op
+    children:
+      system.home: true
+      system.home.set: true
+      system.home.100: true
+  system.home.1:
+    description: Allows up to 1 saved home(s).
+    default: false
+  system.home.2:
+    description: Allows up to 2 saved home(s).
+    default: false
+  system.home.3:
+    description: Allows up to 3 saved home(s).
+    default: false
+  system.home.4:
+    description: Allows up to 4 saved home(s).
+    default: false
+  system.home.5:
+    description: Allows up to 5 saved home(s).
+    default: false
+  system.home.6:
+    description: Allows up to 6 saved home(s).
+    default: false
+  system.home.7:
+    description: Allows up to 7 saved home(s).
+    default: false
+  system.home.8:
+    description: Allows up to 8 saved home(s).
+    default: false
+  system.home.9:
+    description: Allows up to 9 saved home(s).
+    default: false
+  system.home.10:
+    description: Allows up to 10 saved home(s).
+    default: false
+  system.home.11:
+    description: Allows up to 11 saved home(s).
+    default: false
+  system.home.12:
+    description: Allows up to 12 saved home(s).
+    default: false
+  system.home.13:
+    description: Allows up to 13 saved home(s).
+    default: false
+  system.home.14:
+    description: Allows up to 14 saved home(s).
+    default: false
+  system.home.15:
+    description: Allows up to 15 saved home(s).
+    default: false
+  system.home.16:
+    description: Allows up to 16 saved home(s).
+    default: false
+  system.home.17:
+    description: Allows up to 17 saved home(s).
+    default: false
+  system.home.18:
+    description: Allows up to 18 saved home(s).
+    default: false
+  system.home.19:
+    description: Allows up to 19 saved home(s).
+    default: false
+  system.home.20:
+    description: Allows up to 20 saved home(s).
+    default: false
+  system.home.21:
+    description: Allows up to 21 saved home(s).
+    default: false
+  system.home.22:
+    description: Allows up to 22 saved home(s).
+    default: false
+  system.home.23:
+    description: Allows up to 23 saved home(s).
+    default: false
+  system.home.24:
+    description: Allows up to 24 saved home(s).
+    default: false
+  system.home.25:
+    description: Allows up to 25 saved home(s).
+    default: false
+  system.home.26:
+    description: Allows up to 26 saved home(s).
+    default: false
+  system.home.27:
+    description: Allows up to 27 saved home(s).
+    default: false
+  system.home.28:
+    description: Allows up to 28 saved home(s).
+    default: false
+  system.home.29:
+    description: Allows up to 29 saved home(s).
+    default: false
+  system.home.30:
+    description: Allows up to 30 saved home(s).
+    default: false
+  system.home.31:
+    description: Allows up to 31 saved home(s).
+    default: false
+  system.home.32:
+    description: Allows up to 32 saved home(s).
+    default: false
+  system.home.33:
+    description: Allows up to 33 saved home(s).
+    default: false
+  system.home.34:
+    description: Allows up to 34 saved home(s).
+    default: false
+  system.home.35:
+    description: Allows up to 35 saved home(s).
+    default: false
+  system.home.36:
+    description: Allows up to 36 saved home(s).
+    default: false
+  system.home.37:
+    description: Allows up to 37 saved home(s).
+    default: false
+  system.home.38:
+    description: Allows up to 38 saved home(s).
+    default: false
+  system.home.39:
+    description: Allows up to 39 saved home(s).
+    default: false
+  system.home.40:
+    description: Allows up to 40 saved home(s).
+    default: false
+  system.home.41:
+    description: Allows up to 41 saved home(s).
+    default: false
+  system.home.42:
+    description: Allows up to 42 saved home(s).
+    default: false
+  system.home.43:
+    description: Allows up to 43 saved home(s).
+    default: false
+  system.home.44:
+    description: Allows up to 44 saved home(s).
+    default: false
+  system.home.45:
+    description: Allows up to 45 saved home(s).
+    default: false
+  system.home.46:
+    description: Allows up to 46 saved home(s).
+    default: false
+  system.home.47:
+    description: Allows up to 47 saved home(s).
+    default: false
+  system.home.48:
+    description: Allows up to 48 saved home(s).
+    default: false
+  system.home.49:
+    description: Allows up to 49 saved home(s).
+    default: false
+  system.home.50:
+    description: Allows up to 50 saved home(s).
+    default: false
+  system.home.51:
+    description: Allows up to 51 saved home(s).
+    default: false
+  system.home.52:
+    description: Allows up to 52 saved home(s).
+    default: false
+  system.home.53:
+    description: Allows up to 53 saved home(s).
+    default: false
+  system.home.54:
+    description: Allows up to 54 saved home(s).
+    default: false
+  system.home.55:
+    description: Allows up to 55 saved home(s).
+    default: false
+  system.home.56:
+    description: Allows up to 56 saved home(s).
+    default: false
+  system.home.57:
+    description: Allows up to 57 saved home(s).
+    default: false
+  system.home.58:
+    description: Allows up to 58 saved home(s).
+    default: false
+  system.home.59:
+    description: Allows up to 59 saved home(s).
+    default: false
+  system.home.60:
+    description: Allows up to 60 saved home(s).
+    default: false
+  system.home.61:
+    description: Allows up to 61 saved home(s).
+    default: false
+  system.home.62:
+    description: Allows up to 62 saved home(s).
+    default: false
+  system.home.63:
+    description: Allows up to 63 saved home(s).
+    default: false
+  system.home.64:
+    description: Allows up to 64 saved home(s).
+    default: false
+  system.home.65:
+    description: Allows up to 65 saved home(s).
+    default: false
+  system.home.66:
+    description: Allows up to 66 saved home(s).
+    default: false
+  system.home.67:
+    description: Allows up to 67 saved home(s).
+    default: false
+  system.home.68:
+    description: Allows up to 68 saved home(s).
+    default: false
+  system.home.69:
+    description: Allows up to 69 saved home(s).
+    default: false
+  system.home.70:
+    description: Allows up to 70 saved home(s).
+    default: false
+  system.home.71:
+    description: Allows up to 71 saved home(s).
+    default: false
+  system.home.72:
+    description: Allows up to 72 saved home(s).
+    default: false
+  system.home.73:
+    description: Allows up to 73 saved home(s).
+    default: false
+  system.home.74:
+    description: Allows up to 74 saved home(s).
+    default: false
+  system.home.75:
+    description: Allows up to 75 saved home(s).
+    default: false
+  system.home.76:
+    description: Allows up to 76 saved home(s).
+    default: false
+  system.home.77:
+    description: Allows up to 77 saved home(s).
+    default: false
+  system.home.78:
+    description: Allows up to 78 saved home(s).
+    default: false
+  system.home.79:
+    description: Allows up to 79 saved home(s).
+    default: false
+  system.home.80:
+    description: Allows up to 80 saved home(s).
+    default: false
+  system.home.81:
+    description: Allows up to 81 saved home(s).
+    default: false
+  system.home.82:
+    description: Allows up to 82 saved home(s).
+    default: false
+  system.home.83:
+    description: Allows up to 83 saved home(s).
+    default: false
+  system.home.84:
+    description: Allows up to 84 saved home(s).
+    default: false
+  system.home.85:
+    description: Allows up to 85 saved home(s).
+    default: false
+  system.home.86:
+    description: Allows up to 86 saved home(s).
+    default: false
+  system.home.87:
+    description: Allows up to 87 saved home(s).
+    default: false
+  system.home.88:
+    description: Allows up to 88 saved home(s).
+    default: false
+  system.home.89:
+    description: Allows up to 89 saved home(s).
+    default: false
+  system.home.90:
+    description: Allows up to 90 saved home(s).
+    default: false
+  system.home.91:
+    description: Allows up to 91 saved home(s).
+    default: false
+  system.home.92:
+    description: Allows up to 92 saved home(s).
+    default: false
+  system.home.93:
+    description: Allows up to 93 saved home(s).
+    default: false
+  system.home.94:
+    description: Allows up to 94 saved home(s).
+    default: false
+  system.home.95:
+    description: Allows up to 95 saved home(s).
+    default: false
+  system.home.96:
+    description: Allows up to 96 saved home(s).
+    default: false
+  system.home.97:
+    description: Allows up to 97 saved home(s).
+    default: false
+  system.home.98:
+    description: Allows up to 98 saved home(s).
+    default: false
+  system.home.99:
+    description: Allows up to 99 saved home(s).
+    default: false
+  system.home.100:
+    description: Allows up to 100 saved home(s).
+    default: false

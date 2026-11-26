@@ -1,0 +1,171 @@
+enabled: true
+
+permissions:
+  use: "system.aktionshaus.use"
+  admin: "system.aktionshaus.admin"
+
+limits:
+  max-listings-per-player: 10
+  max-price: 1000000000000
+
+creation:
+  default-duration-minutes: 5
+  duration-options-minutes:
+    - 5
+    - 15
+    - 60
+    - 180
+    - 360
+    - 540
+    - 720
+    - 1440
+    - 4320
+
+gui:
+  title: "&aGreenAttack &8» &7Aktionshaus"
+  admin-title: "&aGreenAttack &8» &cAktionshaus Admin"
+  admin-back: "&7Zum Aktionshaus"
+  admin-listing-lore:
+    - "&7Spieler: &e%seller%"
+    - "&7Angebot: &e#%id%"
+    - "&7Sofortkauf: &6%price%"
+    - ""
+    - "&aKlicken, um das Item zurückzusenden"
+  my-title: "&aGreenAttack &8» &7Deine Auktionen"
+  overview-title: "&aGreenAttack &8» &7Deine Übersicht"
+  sort-title: "&aGreenAttack &8» &7Sortierung"
+  search-title: "&aGreenAttack &8» &7Suche"
+  search-placeholder: "Item suchen"
+  search-name: "&bSuche nach Item"
+  my-auctions-name: "&eDeine Auktionen"
+  overview-name: "&cDeine Übersicht"
+  sort-name: "&cSortierung"
+  create-name: "&aAuktion erstellen"
+  create-title: "&aGreenAttack &8» &7Auktion erstellen"
+  create-no-item: "&cKein Item ausgewählt"
+  create-no-item-lore:
+    - "&7Klicke ein Item in deinem Inventar an,"
+    - "&7um es für die Auktion auszuwählen."
+  create-ready-name: "&aBereit"
+  create-ready-lore:
+    - "&7Klicke, um die Auktion zu erstellen."
+  create-not-ready-name: "&cNoch nicht bereit"
+  create-not-ready-lore:
+    - "&7Wähle zuerst ein Item aus deinem Inventar."
+  buy-now-title: "&aGreenAttack &8» &7Sofortkaufpreis"
+  buy-now-name: "&eSofortkaufpreis setzen"
+  start-bid-title: "&aGreenAttack &8» &7Startgebot"
+  start-bid-name: "&eStartgebot setzen"
+  price-placeholder: "Preis eingeben"
+  price-unset-lore:
+    - "&7Noch kein Preis festgelegt."
+    - "&7Klicken, um ihn optional einzugeben."
+  price-current-lore: "&7Aktuell: &e%price%"
+  duration-name: "&eDauer auswählen"
+  duration-lore:
+    - "&7Aktuelle Dauer: &b%duration%"
+    - "&7Linksklick: nächste Dauer"
+    - "&7Rechtsklick: vorherige Dauer"
+  duration-options-header: "&7Mögliche Laufzeiten:"
+  duration-option-selected: "&b» %duration%"
+  duration-option: "&7• %duration%"
+  my-bids-name: "&eDeine Gebote &8[Noch nicht einsatzbereit]"
+  back-name: "&7Zurück"
+  categories:
+    custom-items: "&c&lCustom Items"
+    weapons: "&c&lWerkzeuge & Kampf"
+    armor: "&c&lRüstungen"
+    books: "&c&lBücher"
+    op-items:
+      name: "&c&lOP Items"
+      # Hier stehen Materialnamen oder Muster. * ist ein Platzhalter, z. B. NETHERITE_*.
+      materials:
+        - "NETHERITE_*"
+        - "ELYTRA"
+        - "TRIDENT"
+        - "MACE"
+        - "TOTEM_OF_UNDYING"
+        - "ENCHANTED_GOLDEN_APPLE"
+        - "BEACON"
+        - "NETHER_STAR"
+        - "DRAGON_EGG"
+        - "*_SHULKER_BOX"
+        - "POPLAR_*"
+        - "*POPLAR_*"
+        - "SHELF_MUSHROOM*"
+        - "RED_SHRUB"
+        - "*_CUSHION"
+        - "STRAW_BED"
+        - "*_WOOL_STAIRS"
+        - "*_WOOL_STAIR"
+        - "*_WOOL_SLABS"
+        - "*_WOOL_SLAB"
+        - "*_CONCRETE_STAIRS"
+        - "*_CONCRETE_STAIR"
+        - "*_CONCRETE_SLABS"
+        - "*_CONCRETE_SLAB"
+        - "*_MAP"
+    other: "&c&lAnderes"
+  selected-sort: "&7Aktuell: &e%sort%"
+  previous-page: "&e« Zurück"
+  next-page: "&eNächste Seite »"
+  listing-lore:
+    - "&7Verkäufer: &e%seller%"
+    - "&7Sofortkauf: &6%buy_now%"
+    - "&7Startgebot: &6%starting_bid%"
+    - "&7Dauer: &b%duration%"
+    - "&7Angebot: &e#%id%"
+    - ""
+    - "&aKlicken zum Kaufen"
+  bid-listing-lore:
+    - "&7Verkäufer: &e%seller%"
+    - "&7Startgebot: &6%starting_bid%"
+    - "&7Dauer: &b%duration%"
+    - "&7Angebot: &e#%id%"
+    - ""
+    - "&cGebote sind noch nicht einsatzbereit"
+  my-lore:
+    - "&7Angebot: &e#%id%"
+    - "&7Preis: &6%price%"
+    - ""
+    - "&cKlicken zum Zurücknehmen"
+
+# Angebotsdaten legt das Plugin hier selbst ab. Nicht manuell bearbeiten.
+storage:
+  next-id: 1
+  listings: {}
+
+messages:
+  disabled: "&cDas Aktionshaus ist deaktiviert."
+  no-permission: "&cDazu hast du keine Berechtigung."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  usage: "&7Verwendung: &f/ah [suche <name>|verkaufen <preis>|meine|abbrechen <id>]"
+  search-prompt: "&7Gib den Itemnamen im Suchfenster ein."
+  search-result: "&7Suche nach: &e%query%"
+  search-cleared: "&7Die Suche wurde zurückgesetzt."
+  create-prompt: "&7Gib den Preis für dein Item in den Chat ein. &8(cancel zum Abbrechen)"
+  item-required: "&cWähle zuerst ein Item aus deinem Inventar aus."
+  items-returned: "&aDeine Items wurden dir zurückgegeben."
+  listing-expired: "&eDein Aktionshaus-Angebot &f#%id% &eist abgelaufen und wurde zurückgegeben."
+  listing-already-expired: "&cDieses Angebot ist bereits abgelaufen."
+  input-cancelled: "&7Abgebrochen."
+  not-ready: "&7[Noch nicht einsatzbereit]"
+  bids-unavailable: "&7Deine Gebote &8[Noch nicht einsatzbereit]"
+  sell-usage: "&7Verwendung: &f/ah verkaufen <preis>"
+  cancel-usage: "&7Verwendung: &f/ah abbrechen <id>"
+  hold-item: "&cDu musst das Item zum Verkaufen in der Hand halten."
+  invalid-price: "&cBitte gib einen gültigen Preis größer als 0 an."
+  economy-unavailable: "&cDie Economy ist nicht verfügbar. Prüfe Vault und einen Economy-Anbieter wie EssentialsX."
+  too-many: "&cDu kannst höchstens &e%limit% &cAngebote einstellen."
+  listed: "&aAngebot &e#%id% &afür &e%price% &aeingestellt."
+  purchased: "&aDu hast Angebot &e#%id% &afür &e%price% &agekauft."
+  sold: "&aDein Angebot &e#%id% &awurde für &e%price% &averkauft."
+  cancelled: "&aAngebot &e#%id% &awurde zurückgenommen."
+  not-found: "&cAngebot &e#%id% &cwurde nicht gefunden."
+  not-owner: "&cDieses Angebot gehört dir nicht."
+  buy-own: "&cDu kannst dein eigenes Angebot nicht kaufen."
+  not-enough-money: "&cDu hast nicht genug Geld."
+  transaction-failed: "&cDie Transaktion konnte nicht abgeschlossen werden."
+  admin-returned: "&aAngebot &e#%id% &awurde an &e%seller% &azurückgesendet."
+  admin-returned-to-player: "&eDein Aktionshaus-Angebot &f#%id% &ewurde von einem Admin zurückgegeben."
+  reload: "&aDie Aktionshaus-Konfiguration wurde neu geladen."

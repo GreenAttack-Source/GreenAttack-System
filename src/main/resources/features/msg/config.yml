@@ -1,0 +1,45 @@
+enabled: true
+
+# MySQL/MariaDB-Logs für private Nachrichten.
+# Diesen Pfad auf jedem Paper-Backend konfigurieren:
+# plugins/GreenAttack-System/features/msg/config.yml
+# Für netzwerkweite Logs dieselbe Datenbank und denselben Tabellennamen verwenden.
+# server-id ist ein eindeutiger Name des jeweiligen Backends, zum Beispiel Lobby.
+database:
+  enabled: false
+  jdbc-url: ""
+  host: ""
+  port: 3306
+  name: ""
+  user: ""
+  password: ""
+  server-id: ""
+  table-name: "greenattack_messages"
+  connection-timeout-ms: 3000
+
+logs:
+  page-size: 15
+  timezone: "Europe/Berlin"
+
+permissions:
+  use: "system.msg.use"
+  see: "system.msg.see"
+
+messages:
+  disabled: "&cDas Nachrichten-System ist deaktiviert."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  usage: "&7Verwendung: &f/msg <Spieler> <Nachricht>"
+  logs-usage: "&7Verwendung: &f/msglogs [Seite]"
+  player-not-found: "&cDieser Spieler ist auf diesem Server nicht online."
+  player-not-found-network: "&cDieser Spieler ist im Netzwerk nicht online."
+  cannot-message-self: "&cDu kannst dir selbst keine Nachricht senden."
+  sent: "&8[&aDu &7-> &e%player%&8] &f%message%"
+  received: "&8[&e%player% &7-> &aDu&8] &f%message%"
+  logs-unavailable: "&cDie Nachrichtenlogs sind nicht verfügbar. Aktiviere und konfiguriere MySQL in features/msg/config.yml."
+  log-header: "&6Nachrichtenlogs &7(Seite &e%page%&7/&e%pages%&7):"
+  log-entry: "&8%time% &e%sender% &7-> &e%recipient% &8(&b%server%&8)&7: &f%message%"
+  log-empty: "&eEs wurden noch keine Nachrichten gespeichert."
+  page-invalid: "&cDie Seite muss eine Zahl ab 1 sein."
+  page-not-found: "&cDiese Log-Seite gibt es nicht."
+  database-error: "&cDie Nachrichtenlogs konnten gerade nicht geladen werden."

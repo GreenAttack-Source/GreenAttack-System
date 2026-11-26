@@ -1,0 +1,23 @@
+enabled: true
+
+# When changing another player's mode, notify that player as well.
+notify-target: true
+
+mode-names:
+  survival: "Überleben"
+  creative: "Kreativ"
+  adventure: "Abenteuer"
+  spectator: "Zuschauer"
+
+messages:
+  disabled: "&cDas Gamemode-Feature ist deaktiviert."
+  usage: "&7Verwendung: &f/gamemode <survival|creative|adventure|spectator> [Spieler]"
+  shortcut-usage: "&7Verwendung: &f/%label% [Spieler]"
+  invalid-mode: "&cUnbekannter Spielmodus. Nutze survival, creative, adventure oder spectator."
+  no-permission: "&cDu darfst diesen Spielmodus nicht setzen."
+  no-other-permission: "&cDu darfst den Spielmodus anderer Spieler nicht ändern."
+  player-only: "&cDie Konsole muss einen Spieler angeben."
+  player-not-found: "&cDer Spieler &e%player% &cist nicht online."
+  changed-self: "&aDein Spielmodus wurde auf &e%mode% &agesetzt."
+  changed-other: "&aSpielmodus von &e%player% &aauf &e%mode% &agesetzt."
+  target-changed: "&aDein Spielmodus wurde auf &e%mode% &agesetzt."

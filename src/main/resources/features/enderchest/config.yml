@@ -1,0 +1,11 @@
+enabled: true
+
+permissions:
+  ec: "system.ec"
+
+messages:
+  disabled: "&cDieses Feature ist deaktiviert."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  usage: "&7Verwendung: &f/ec"
+  opened: "&aDu hast deine Endertruhe geöffnet."

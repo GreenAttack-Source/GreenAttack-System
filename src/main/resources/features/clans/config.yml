@@ -1,0 +1,223 @@
+enabled: true
+
+# ---------------------------------------------------------------------------
+# Datenbank (PFLICHT). Alle Paper-Server, die dieselbe Datenbank nutzen, teilen sich
+# dieselben Clans. Trag deine Zugangsdaten ein und setze enabled auf true.
+# Tabellen (werden automatisch angelegt): <table-prefix>clans, clan_members, clan_roles, clan_homes
+# ---------------------------------------------------------------------------
+database:
+  enabled: false
+  type: mysql          # mysql oder mariadb
+  host: localhost
+  port: 3306
+  name: greenattack
+  user: ""
+  password: ""
+  table-prefix: gc_
+  jdbc-url: ""         # optional, ersetzt host/port/name komplett
+
+# ---------------------------------------------------------------------------
+# Clan-Homes
+# ---------------------------------------------------------------------------
+# Wie viele Homes ein Clan haben darf.
+max-homes: 3
+# Name DIESES Servers, genau so wie in Velocity (zum Beispiel citybuild). Damit funktioniert
+# /clan home auch von einem anderen Server aus (braucht GreenAttack-System-Velocity ab 1.1.17).
+# Leer lassen = Homes gelten nur auf dem Server, auf dem sie gesetzt wurden.
+server-id: ""
+
+# ---------------------------------------------------------------------------
+# Rollen (liegen in der Datenbank, nicht in LuckPerms)
+# Jeder Clan hat die Rollen Owner und Member. Beide sind nicht loeschbar.
+# Owner steht immer ueber allen eigenen Rollen, Member immer darunter.
+# ---------------------------------------------------------------------------
+owner-weight: 1000
+member-weight: 1
+max-roles: 10                 # eigene Rollen pro Clan
+# Rechte der Standardrolle Member fuer NEUE Clans. Moeglich:
+# roles_view, roles_edit, members_view, invite, kick, role_assign, home_use, home_set,
+# plot, tasks, color, rename, tag, settings
+default-member-permissions:
+  - members_view
+  - roles_view
+  - home_use
+
+# Beitritt fuer neue Clans: invite, open oder closed (bei /clan settings join auch als close nutzbar)
+default-join-mode: invite
+
+# ---------------------------------------------------------------------------
+# Preise
+# ---------------------------------------------------------------------------
+create-cost: 250000          # Economy-Dollar fuer /clan create; alternativ "free" fuer kostenlose Gruendung
+rename-cost: 0               # Economy-Dollar fuer eine Namensaenderung (0 = gratis)
+color-cost-normal: 100       # Kristalle fuer eine Farbe wie pink, gold, aqua ...
+color-cost-hex: 250          # Kristalle fuer eine freie Hex-Farbe wie #ff8800
+
+# ---------------------------------------------------------------------------
+# Aussehen: der Tag erscheint immer in GROSSBUCHSTABEN als [TAG].
+# ---------------------------------------------------------------------------
+default-color: pink          # Farbe neuer Clans (Name oder #RRGGBB)
+bracket-color: "&7"
+
+# Regeln
+name:
+  min: 3
+  max: 16
+tag:
+  min: 2
+  max: 5
+max-members: 20
+invite-expire-seconds: 60
+list-size: 30
+top-size: 10
+cache-refresh-seconds: 30    # wie oft Aenderungen anderer Server uebernommen werden (Neustart noetig)
+
+# LuckPerms-Suffix: Der Clan-Tag erscheint in seiner eingestellten Clan-Farbe mit Prioritaet 0.
+luckperms-suffix:
+  enabled: true
+  format: " [%tag%]"
+  applied: {}
+
+# Placeholder (PlaceholderAPI):
+#   %clan_tag%        z. B. [WLF] in Clan-Farbe
+#   %clan_tag_plain%  nur der Tag-Text ohne Farben und Klammern
+#   %clan_name%       Clan-Name
+#   %clan_role%       Eigene Clan-Rolle
+#   %clan_members%    Mitgliederzahl
+# Ohne Clan sind alle Placeholder leer.
+
+messages:
+  action-self: "&cDas geht nicht mit dir selbst."
+  admin-disband: "&aDer Clan &e%clan% &awurde aufgelöst."
+  admin-is-owner: "&e%player% &cist Owner eines Clans mit weiteren Mitgliedern. Löse den Clan mit &f/clanadmin disband &cauf."
+  admin-kick: "&e%player% &awurde aus dem Clan &e%value% &aentfernt."
+  admin-no-member: "&cDer Spieler &e%player% &cist in keinem Clan."
+  admin-setcolor: "&aDie Tag-Farbe von &e%clan% &awurde geändert."
+  admin-settag: "&aDer Tag von &e%clan% &awurde geändert: &f%value%"
+  all-permissions: "alle Rechte"
+  already-in-clan: "&cDu bist bereits in einem Clan."
+  chat-format: "&8[&dClan&8] &7%role% &f%player%&8: &f%message%"
+  chat-off: "&7Clan-Chat &causgeschaltet&7. Du schreibst wieder im normalen Chat."
+  chat-on: "&7Clan-Chat &aeingeschaltet&7. Alles, was du schreibst, sieht nur dein Clan. Wieder aus mit &f/clan chat&7."
+  chat-toggle-unavailable: "&cDer Umschalter ist nicht verfügbar. Nutze &f/cc <Nachricht>&c."
+  clan-closed: "&cDein Clan ist geschlossen. Ändere den Beitrittsmodus mit &f/clan settings joinmode invite&c."
+  clan-closed-join: "&cDer Clan &e%clan% &cist geschlossen."
+  clan-full: "&cDein Clan ist voll."
+  clan-gone: "&cDen Clan &e%clan% &cgibt es nicht (mehr)."
+  clan-not-open: "&cDer Clan &e%clan% &cist nicht offen. Du brauchst eine Einladung."
+  color-done: "&aDie Tag-Farbe wurde geändert. &7(%cost% Kristalle)"
+  created: "&aDer Clan &e%clan% &awurde gegründet. Dein Tag ist jetzt sichtbar. Öffne das Clan-Menü mit &f/clan&a."
+  created-notify: "&e%player% &7hat den Clan &e%clan% &7[%tag%] gegründet."
+  db-error: "&cDie Clan-Datenbank ist gerade nicht erreichbar. Es wurde nichts abgebucht. Bitte melde das einem Admin."
+  db-not-configured: "&cDas Clan-System braucht eine Datenbank. Bitte database.enabled in features/clans/config.yml aktivieren."
+  disabled: "&cDas Clan-System ist derzeit deaktiviert."
+  delete-confirm: "&cBist du wirklich sicher, dass du den Clan &e%clan% &clöschen möchtest? Bestätige innerhalb von 60 Sekunden mit &f/clan delete confirm&c."
+  delete-confirm-expired: "&cEs gibt keine gültige Löschbestätigung. Starte mit &f/clan delete&c."
+  deleted: "&aDer Clan &e%clan% &awurde gelöscht."
+  owner-delete-required: "&cDer Clan-Leader kann nicht austreten. Übertrage die Leitung mit &f/clan transfer <Spieler> &coder lösche den Clan mit &f/clan delete&c."
+  economy-missing: "&cDas Wirtschaftssystem ist nicht verfügbar."
+  help-header: "&aClan-Befehle:"
+  hierarchy: "&cDas geht nur mit Mitgliedern und Rollen, die unter deiner Rolle stehen."
+  home-choose: "&7Dein Clan hat mehrere Homes. Nutze &f/clan home <Name>&7. Siehe &f/clan homes&7."
+  home-deleted: "&aClan-Home &e%home% &awurde gelöscht."
+  home-limit: "&cDein Clan kann höchstens &e%max% &cHomes haben. Lösche erst eins mit &f/clan delhome <Name>&c."
+  home-remote: "&eVerbinde dich mit &6%server% &efür das Clan-Home &6%home%&e."
+  home-remote-failed: "&cDer Serverwechsel konnte nicht gestartet werden."
+  home-set: "&aClan-Home &e%home% &agesetzt."
+  home-teleported: "&aDu wurdest zum Clan-Home &e%home% &ateleportiert."
+  home-unknown: "&cEs gibt kein Clan-Home &e%home%&c."
+  home-world-missing: "&cDie Welt dieses Homes ist gerade nicht verfügbar."
+  homes-empty: "&7Dein Clan hat noch kein Home. Setze eins mit &f/clan sethome <Name>&7."
+  homes-header: "&aClan-Homes (%count%/%max%):"
+  homes-line: "&8- &e%home% &7(%server%)"
+  info-header: "&aClan &e%clan% &7[%tag%&7]"
+  info-members: "&7Mitglieder: &f%online%&7/&f%count% &7online"
+  info-owner: "&7Owner: &f%owner%"
+  info-status: "&7Gegründet: &f%created% &8| &7Beitritt: &f%mode%"
+  invalid-color: "&cUnbekannte Farbe. Erlaubt sind Farbnamen wie pink, gold, aqua oder Hex wie #ff8800."
+  invalid-home-name: "&cHome-Namen dürfen nur Buchstaben, Zahlen, _ und - enthalten (1 bis 16 Zeichen)."
+  invalid-name: "&cDer Clan-Name darf nur Buchstaben, Zahlen, _ und - enthalten (%min% bis %max% Zeichen)."
+  invalid-permission: "&cUnbekanntes Recht. Möglich: &f%list%"
+  invalid-role-name: "&cRollennamen dürfen nur Buchstaben, Zahlen, _ und - enthalten (2 bis 16 Zeichen)."
+  invalid-tag: "&cDer Tag darf nur Buchstaben und Zahlen enthalten (%min% bis %max% Zeichen)."
+  invite-denied: "&7Du hast die Einladung von &e%clan% &7abgelehnt."
+  invite-denied-notify: "&e%player% &7hat deine Einladung abgelehnt."
+  invite-received: "&e%inviter% &7hat dich in den Clan &e%clan% &7eingeladen. &f/clan accept &7oder &f/clan deny &7(%seconds%s)"
+  invite-self: "&cDu kannst dich nicht selbst einladen."
+  invite-sent: "&aDu hast &e%player% &ain den Clan eingeladen."
+  left: "&aDu hast den Clan &e%clan% &averlassen."
+  left-notify: "&e%player% &7hat den Clan verlassen."
+  joined: "&aDu bist dem Clan &e%clan% &abeigetreten."
+  joined-notify: "&e%player% &7ist dem Clan beigetreten."
+  joinmode-done: "&aBeitritt: &e%mode%"
+  kick-done: "&e%player% &awurde aus dem Clan geworfen."
+  kick-target: "&cDu wurdest aus dem Clan geworfen."
+  kristall-missing: "&cDas Kristall-System ist nicht verfügbar."
+  kristall-save-failed: "&cDein Kristallkonto konnte nicht gespeichert werden."
+  left: "&aDu hast den Clan &e%clan% &averlassen."
+  left-notify: "&e%player% &7hat den Clan verlassen."
+  list-empty: "&7Es gibt noch keine Clans."
+  list-line: "&8#%rank% &e%clan% &8- &f%count% &7Mitglieder &8(%mode%&8)"
+  member-not-found: "&cIn deinem Clan gibt es keinen Spieler &e%player%&c."
+  members-header: "&aMitglieder von &e%clan%&a:"
+  members-line: "&8- %state%%player% &7(%role%)"
+  mode-closed: "geschlossen"
+  mode-invite: "nur mit Einladung"
+  mode-open: "offen"
+  name-taken: "&cDen Clan &e%clan% &cgibt es bereits. Du hast nichts bezahlt."
+  name-taken-free: "&cDen Clan &e%clan% &cgibt es bereits."
+  no-invite: "&cDu hast keine offene Einladung."
+  no-permission: "&cDazu hast du keine Rechte."
+  no-permissions: "keine Rechte"
+  no-rights: "&cDazu hast du im Clan keine Rechte."
+  not-enough-kristalle: "&cEine neue Tag-Farbe kostet &b%cost% Kristalle&c. Du hast &b%balance%&c."
+  not-enough-money: "&cDie Clan-Gründung kostet &e%cost%&c. Dir fehlt Geld."
+  not-enough-money-rename: "&cDie Umbenennung kostet &e%cost%&c. Dir fehlt Geld."
+  not-in-clan: "&cDu bist in keinem Clan."
+  not-in-clan-info: "&cDu bist in keinem Clan. Mit &f/clan info <Clan> &csiehst du andere Clans."
+  owner-role: "&cDie Owner-Rolle gibst du mit &f/clan transfer <Spieler> &cab."
+  player-offline: "&cDer Spieler &e%player% &cist nicht online."
+  player-only: "&cDiesen Befehl kann nur ein Spieler verwenden."
+  prompt-cancel: "&7Zum Abbrechen schreibe &fabbrechen&7."
+  prompt-cancelled: "&7Abgebrochen."
+  prompt-hex: "&aSchreibe die Farbe als &f#RRGGBB &ain den Chat, zum Beispiel &f#ff8800&a."
+  prompt-home: "&aSchreibe den Namen für das Clan-Home in den Chat."
+  prompt-rename: "&aSchreibe den neuen Clan-Namen in den Chat."
+  prompt-role: "&aSchreibe &fName Gewicht &ain den Chat, zum Beispiel &fsupporter 50&a."
+  prompt-role-format: "&cFormat: &fName Gewicht &c(zum Beispiel &fsupporter 50&c). Starte im Menü neu."
+  prompt-tag: "&aSchreibe den neuen Clan-Tag in den Chat."
+  prompt-unavailable: "&cDie Chat-Eingabe ist nicht verfügbar. Nutze den passenden Befehl, siehe &f/clan help&c."
+  rename-done: "&aDein Clan heißt jetzt &e%clan%&a."
+  rename-notify: "&7Der Clan heißt jetzt &e%clan%&7."
+  role-bad-weight: "&cDas Gewicht muss zwischen &e%min% &cund &e%max% &cliegen (unter deiner eigenen Rolle)."
+  role-created: "&aDie Rolle &e%role% &awurde erstellt. Rechte vergibst du mit &f/clan role perm %role% <Recht> on&a."
+  role-deleted: "&aDie Rolle &e%role% &awurde gelöscht. Ihre Mitglieder sind jetzt Member."
+  role-exists: "&cEine Rolle mit diesem Namen gibt es schon."
+  role-limit: "&cDein Clan kann höchstens %max% eigene Rollen haben."
+  role-owner-fixed: "&cDie Owner-Rolle hat immer alle Rechte und kann nicht bearbeitet werden."
+  role-perm-done: "&aRecht &e%perm% &afür &e%role% &a: &f%state%"
+  role-perm-lacking: "&cDu kannst nur Rechte vergeben, die du selbst hast: &e%perm%"
+  role-system: "&cDie Rolle &e%role% &cist eine Standardrolle und kann so nicht geändert werden."
+  role-weight-done: "&aDie Rolle &e%role% &ahat jetzt das Gewicht &e%value%&a."
+  roles-header: "&aRollen deines Clans:"
+  roles-line: "&e%role% &7(Gewicht %weight%) &8- &f%perms%"
+  same-color: "&cDein Clan hat diese Farbe schon."
+  same-name: "&cDein Clan heißt schon so."
+  same-tag: "&cDein Clan hat diesen Tag schon."
+  setrole-done: "&e%player% &ahat jetzt die Rolle &e%role%&a."
+  setrole-target: "&aDeine Rolle im Clan ist jetzt &e%role%&a."
+  settings-joinmode: "&7Beitritt: &f%mode% &8| &7Ändern: &f/clan settings join <invite|close|open>"
+  tag-done: "&aDer Tag deines Clans ist jetzt &e%tag%&a. Das war kostenlos."
+  tag-taken: "&cDen Tag &e%tag% &cgibt es bereits. Du hast nichts bezahlt."
+  tag-taken-free: "&cDen Tag &e%tag% &cgibt es bereits."
+  target-in-clan: "&e%player% &cist bereits in einem Clan."
+  transfer-done: "&e%player% &aist jetzt der neue Owner. Du bist wieder Member."
+  transfer-notify: "&e%player% &7ist jetzt der Owner des Clans."
+  unknown-clan: "&cDen Clan &e%clan% &cgibt es nicht."
+  unknown-role: "&cDie Rolle &e%role% &cgibt es nicht."
+  usage-create: "&7Verwendung: &f/clan create <Name> <Tag>"
+  usage-generic: "&7Verwendung: &f/clan %usage%"
+  usage-role: "&7Verwendung: &f/clan role <create <Name> <Gewicht> | delete <Name> | weight <Name> <Gewicht> | perm <Name> <Recht> [on|off] | info <Name>>"
+  list-header: "&aAlle Clans:"
+  top-header: "&aGrößte Clans:"
+  usage-admin: "&7Verwendung: &f/clanadmin <disband <Clan> | kick <Spieler> | settag <Clan> <Tag> | setcolor <Clan> <Farbe>>"

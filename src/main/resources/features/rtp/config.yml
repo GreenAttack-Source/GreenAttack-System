@@ -1,0 +1,28 @@
+enabled: true
+
+permissions:
+  use: "system.rtp"
+
+# Empty list means /rtp works in any world. The player stays in the current world.
+allowed-worlds: []
+
+search:
+  min-radius: 100
+  max-radius: 5000
+  max-attempts: 25
+  cooldown-seconds: 30
+
+messages:
+  disabled: "&cRTP ist derzeit deaktiviert."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  usage: "&7Verwendung: &f/rtp"
+  world-not-allowed: "&cRTP ist in der Welt &e%world% &cnicht verfügbar."
+  cooldown: "&cBitte warte noch &e%seconds% Sekunden &cbis zum nächsten RTP."
+  invalid-config: "&cDie RTP-Konfiguration ist ungültig. Bitte informiere ein Teammitglied."
+  preparing: "&aSuche einen sicheren Ort. Bewege dich nicht; der Teleport startet in 3 Sekunden."
+  already-searching: "&eDein Zufallsteleport läuft bereits. Bewege dich nicht."
+  cancelled-movement: "&cDer Zufallsteleport wurde abgebrochen, weil du dich bewegt hast."
+  no-safe-location: "&cEs wurde kein sicherer RTP-Ort gefunden. Versuche es erneut."
+  teleport-failed: "&cDer Teleport wurde abgebrochen."
+  teleported: "&aDu wurdest sicher zufällig teleportiert."

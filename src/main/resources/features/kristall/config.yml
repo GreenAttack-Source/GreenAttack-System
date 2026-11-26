@@ -1,0 +1,17 @@
+enabled: true
+
+permissions:
+  admin: "system.kristall.admin"
+
+messages:
+  disabled: "&cDas Kristall-Feature ist deaktiviert."
+  no-permission: "&cDazu hast du keine Berechtigung."
+  usage: "&7Verwendung: &f/ka|/kristall|/kristalle <give|set|take> <Spieler> <Anzahl|1k|1m> &7oder &f/ka|/kristall|/kristalle reset <Spieler>"
+  invalid-amount: "&cBitte gib eine positive ganze Zahl an, z.B. 1000, 1k oder 1m."
+  invalid-set-amount: "&cFür set muss die Anzahl mindestens 0 sein."
+  player-not-found: "&cSpieler &e%player% &cwurde nicht gefunden."
+  reset: "&aKristallkonto von &e%player% &awurde auf &e0 &aKristalle zurückgesetzt."
+  not-enough: "&cDer Spieler besitzt nur &e%balance% &cKristalle."
+  balance-overflow: "&cDer Kristallkontostand wäre zu hoch."
+  save-failed: "&cDer Kristallkontostand konnte nicht gespeichert werden."
+  updated: "&aKristallkonto von &e%player% &aauf &e%balance% &aKristalle gesetzt."

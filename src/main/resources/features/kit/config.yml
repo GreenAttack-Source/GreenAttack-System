@@ -1,0 +1,15 @@
+enabled: true
+
+# Das Kit wird automatisch beim ersten Join an Spieler mit leerem Inventar ausgegeben.
+kit:
+  ready: false
+
+messages:
+  disabled: "&cDas Starterkit ist derzeit deaktiviert."
+  no-permission: "&cDazu hast du keine Rechte."
+  player-only: "&cDiesen Befehl kann nur ein Spieler verwenden."
+  usage: "&7Verwendung: &f/kit set"
+  not-set: "&cDas Starterkit wurde noch nicht eingerichtet."
+  saved: "&aDein aktuelles Inventar inklusive Rüstung und Nebenhand wurde als Starterkit gespeichert."
+  save-failed: "&cDas Starterkit konnte nicht gespeichert werden."
+  joined: "&aDu hast dein Starterkit erhalten."

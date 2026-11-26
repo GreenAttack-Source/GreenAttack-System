@@ -1,0 +1,70 @@
+enabled: true
+
+# Wie viele Codes /codetop anzeigt (1 bis 50).
+top-size: 10
+
+# ---------------------------------------------------------------------------
+# Speicher. Standard: lokale Dateien (codes.tsv, redeemed.tsv) in diesem Ordner.
+# Mit enabled: true werden Codes und Einlösungen in MySQL/MariaDB gespeichert.
+# Dann gilt "ein Code pro Spieler" auf ALLEN Servern, die dieselbe Datenbank nutzen.
+# Die Tabellen <table-prefix>codes und <table-prefix>code_redemptions werden
+# automatisch angelegt. Lokale Dateien werden dabei NICHT übernommen.
+# ---------------------------------------------------------------------------
+database:
+  enabled: false
+  type: mysql          # mysql oder mariadb
+  host: localhost
+  port: 3306
+  name: greenattack
+  user: ""
+  password: ""
+  table-prefix: gc_
+  jdbc-url: ""         # optional, ersetzt host/port/name komplett
+
+# Jeder Spieler kann insgesamt nur EINEN Code einlösen, egal welchen.
+# Befehle:
+#   /code <Code>                              Code einlösen
+#   /codecreate <Code> [/Befehl mit %player%]  Code erstellen (mehrere Befehle mit ;; trennen)
+#   /codeconfig <Code>                         Belohnungen des Codes mit Nummern anzeigen
+#   /codeconfig <Code> add <Befehl>            Belohnung hinzufügen
+#   /codeconfig <Code> remove <Nummer|Befehl>  Belohnung entfernen
+#   /codeconfig <Code> set <Nummer> <Befehl>   Belohnung mit dieser Nummer ändern
+#   /codereset <Spieler>                       eingelösten Code eines Spielers zurücksetzen (Test)
+#   /codedelete <Code>                         Code löschen
+#   /codetop                                   meistgenutzte Codes
+# Platzhalter in Belohnungen: %player% und %uuid%. Sie laufen als Konsolenbefehl.
+
+messages:
+  disabled: "&cDas Code-System ist derzeit deaktiviert."
+  no-permission: "&cDazu hast du keine Rechte."
+  player-only: "&cDiesen Befehl kann nur ein Spieler verwenden."
+  db-error: "&cDer Speicher (Datenbank/Datei) ist gerade nicht erreichbar. Bitte melde das einem Admin."
+  usage: "&7Verwendung: &f/code <Code>"
+  usage-create: "&7Verwendung: &f/codecreate <Code> [/Befehl mit %player%, mehrere mit ;; trennen]"
+  usage-config: "&7Verwendung: &f/codeconfig <Code> [add <Befehl> | remove <Nummer oder Befehl> | set <Nummer> <Befehl>]"
+  usage-config-add: "&7Verwendung: &f/codeconfig <Code> add <Befehl mit %player%>"
+  usage-config-remove: "&7Verwendung: &f/codeconfig <Code> remove <Nummer oder Befehl>"
+  usage-config-set: "&7Verwendung: &f/codeconfig <Code> set <Nummer> <Befehl mit %player%>"
+  usage-delete: "&7Verwendung: &f/codedelete <Code>"
+  usage-reset: "&7Verwendung: &f/codereset <Spieler>"
+  invalid-code: "&cCodes dürfen nur aus Buchstaben, Zahlen, _ und - bestehen (2 bis 32 Zeichen)."
+  invalid-reward: "&cDie Belohnung enthält ungültige Zeichen."
+  unknown-code: "&cDen Code &e%code% &cgibt es nicht."
+  already-used: "&cDu hast bereits einen Code eingelöst. Es kann nur ein Code pro Spieler genutzt werden."
+  already-exists: "&cDen Code &e%code% &cgibt es bereits."
+  redeemed: "&aDu hast den Code &e%code% &aeingelöst!"
+  created: "&aCode &e%code% &awurde erstellt."
+  deleted: "&aCode &e%code% &awurde gelöscht. Spieler, die ihn schon genutzt haben, können trotzdem keinen weiteren Code einlösen."
+  config-header: "&7Belohnungen von &e%code%&7:"
+  config-line: "&8%number%. &f%command%"
+  config-none: "&7Der Code &e%code% &7hat keine Belohnung."
+  config-added: "&aBelohnung zu &e%code% &ahinzugefügt: &f%command%"
+  config-removed: "&aBelohnung von &e%code% &aentfernt: &f%command%"
+  config-set: "&aBelohnung von &e%code% &ageändert: &f%command%"
+  config-bad-number: "&cEs gibt keine Belohnung mit der Nummer &e%number%&c. Mit &f/codeconfig %code% &cwerden alle angezeigt."
+  config-not-found: "&cDiesen Befehl hat der Code nicht: &f%command%"
+  reset-done: "&aDer Code &e%code% &avon &e%player% &awurde zurückgesetzt. Der Spieler kann wieder einen Code einlösen."
+  reset-none: "&e%player% &chat noch keinen Code eingelöst."
+  top-header: "&aMeistgenutzte Codes:"
+  top-line: "&8#%rank% &e%code% &8- &f%uses% &7Nutzungen"
+  top-empty: "&7Es gibt noch keine Codes."

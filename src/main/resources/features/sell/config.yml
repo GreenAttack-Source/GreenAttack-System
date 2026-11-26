@@ -1,0 +1,264 @@
+enabled: true
+
+# Preis pro Item. Nicht aufgeführte Materialien verwenden default-price.
+# Die Werte sind Startpreise und können servergerecht angepasst werden.
+default-price: 0.05
+
+prices:
+  COAL: 0.25
+  CHARCOAL: 0.2
+  COPPER_INGOT: 0.2
+  RAW_COPPER: 0.15
+  IRON_INGOT: 0.75
+  RAW_IRON: 0.6
+  GOLD_INGOT: 1.25
+  RAW_GOLD: 1.0
+  LAPIS_LAZULI: 0.35
+  REDSTONE: 0.3
+  QUARTZ: 0.6
+  AMETHYST_SHARD: 0.5
+  PRISMARINE_SHARD: 0.5
+  PRISMARINE_CRYSTALS: 0.75
+  DIAMOND: 8.0
+  EMERALD: 4.0
+  NETHERITE_SCRAP: 35.0
+  NETHERITE_INGOT: 140.0
+  ANCIENT_DEBRIS: 40.0
+  NETHER_STAR: 250.0
+  BEACON: 300.0
+  DRAGON_EGG: 1000.0
+  ELYTRA: 300.0
+  SHULKER_SHELL: 8.0
+  TOTEM_OF_UNDYING: 20.0
+  ENCHANTED_GOLDEN_APPLE: 25.0
+  GOLDEN_APPLE: 2.5
+  TRIDENT: 15.0
+  MACE: 30.0
+  HEAVY_CORE: 60.0
+  BREEZE_ROD: 4.0
+  ECHO_SHARD: 3.0
+  HEART_OF_THE_SEA: 12.0
+  NAUTILUS_SHELL: 2.0
+  SHULKER_BOX: 10.0
+  DIAMOND_BLOCK: 70.0
+  EMERALD_BLOCK: 35.0
+  GOLD_BLOCK: 11.0
+  IRON_BLOCK: 6.5
+  NETHERITE_BLOCK: 1200.0
+
+  # Häufige Erze und Rohstoffblöcke
+  COAL_ORE: 0.25
+  DEEPSLATE_COAL_ORE: 0.25
+  COPPER_ORE: 0.15
+  DEEPSLATE_COPPER_ORE: 0.15
+  IRON_ORE: 0.6
+  DEEPSLATE_IRON_ORE: 0.6
+  GOLD_ORE: 1.0
+  DEEPSLATE_GOLD_ORE: 1.0
+  REDSTONE_ORE: 0.3
+  DEEPSLATE_REDSTONE_ORE: 0.3
+  LAPIS_ORE: 0.35
+  DEEPSLATE_LAPIS_ORE: 0.35
+  DIAMOND_ORE: 8.0
+  DEEPSLATE_DIAMOND_ORE: 8.0
+  EMERALD_ORE: 4.0
+  DEEPSLATE_EMERALD_ORE: 4.0
+  NETHER_GOLD_ORE: 0.5
+  NETHER_QUARTZ_ORE: 0.6
+  COAL_BLOCK: 2.2
+  COPPER_BLOCK: 1.8
+  EXPOSED_COPPER: 1.8
+  WEATHERED_COPPER: 1.8
+  OXIDIZED_COPPER: 1.8
+  WAXED_COPPER_BLOCK: 1.8
+  WAXED_EXPOSED_COPPER: 1.8
+  WAXED_WEATHERED_COPPER: 1.8
+  WAXED_OXIDIZED_COPPER: 1.8
+  RAW_COPPER_BLOCK: 1.35
+  RAW_IRON_BLOCK: 5.4
+  RAW_GOLD_BLOCK: 9.0
+  LAPIS_BLOCK: 2.8
+  REDSTONE_BLOCK: 2.4
+  AMETHYST_BLOCK: 1.8
+  BUDDING_AMETHYST: 0.0
+
+  # Citybuild-Baumaterialien
+  STONE: 0.03
+  COBBLESTONE: 0.03
+  DEEPSLATE: 0.04
+  COBBLED_DEEPSLATE: 0.04
+  TUFF: 0.04
+  CALCITE: 0.05
+  ANDESITE: 0.03
+  DIORITE: 0.03
+  GRANITE: 0.03
+  BLACKSTONE: 0.04
+  BASALT: 0.04
+  SMOOTH_BASALT: 0.05
+  NETHERRACK: 0.01
+  END_STONE: 0.15
+  OBSIDIAN: 0.5
+  CRYING_OBSIDIAN: 0.75
+  SAND: 0.02
+  RED_SAND: 0.03
+  GRAVEL: 0.02
+  CLAY_BALL: 0.08
+  CLAY: 0.32
+  BRICK: 0.15
+  GLASS: 0.04
+  GLASS_PANE: 0.01
+  TERRACOTTA: 0.08
+  WHITE_TERRACOTTA: 0.08
+  QUARTZ_BLOCK: 2.4
+  QUARTZ_BRICKS: 2.4
+  PRISMARINE: 0.2
+  PRISMARINE_BRICKS: 0.35
+  DARK_PRISMARINE: 0.4
+  SEA_LANTERN: 1.5
+  SOUL_SAND: 0.06
+  SOUL_SOIL: 0.06
+  GLOWSTONE_DUST: 0.1
+  GLOWSTONE: 0.36
+  NETHER_BRICK: 0.1
+  NETHER_WART_BLOCK: 0.03
+  WARPED_STEM: 0.12
+  CRIMSON_STEM: 0.12
+  BAMBOO_BLOCK: 0.12
+
+  # Holz und erneuerbare Farm-Ressourcen
+  OAK_LOG: 0.12
+  SPRUCE_LOG: 0.12
+  BIRCH_LOG: 0.12
+  JUNGLE_LOG: 0.12
+  ACACIA_LOG: 0.12
+  DARK_OAK_LOG: 0.12
+  MANGROVE_LOG: 0.12
+  CHERRY_LOG: 0.12
+  PALE_OAK_LOG: 0.12
+  CRIMSON_HYPHAE: 0.12
+  WARPED_HYPHAE: 0.12
+  OAK_PLANKS: 0.03
+  SPRUCE_PLANKS: 0.03
+  BIRCH_PLANKS: 0.03
+  JUNGLE_PLANKS: 0.03
+  ACACIA_PLANKS: 0.03
+  DARK_OAK_PLANKS: 0.03
+  MANGROVE_PLANKS: 0.03
+  CHERRY_PLANKS: 0.03
+  PALE_OAK_PLANKS: 0.03
+  BAMBOO: 0.04
+  STICK: 0.02
+  WHEAT: 0.1
+  WHEAT_SEEDS: 0.02
+  HAY_BLOCK: 0.9
+  CARROT: 0.08
+  POTATO: 0.08
+  BEETROOT: 0.08
+  BEETROOT_SEEDS: 0.02
+  PUMPKIN: 0.25
+  MELON_SLICE: 0.03
+  MELON: 0.27
+  SUGAR_CANE: 0.08
+  SUGAR: 0.03
+  CACTUS: 0.06
+  COCOA_BEANS: 0.05
+  NETHER_WART: 0.1
+  SWEET_BERRIES: 0.03
+  GLOW_BERRIES: 0.06
+  APPLE: 0.1
+  EGG: 0.05
+  HONEYCOMB: 0.2
+  HONEY_BOTTLE: 0.15
+  HONEY_BLOCK: 1.35
+  WHITE_WOOL: 0.1
+  STRING: 0.1
+
+  # Häufige Mob-Drops, Nahrung und Anglerware
+  ROTTEN_FLESH: 0.02
+  BONE: 0.12
+  BONE_BLOCK: 1.05
+  ARROW: 0.05
+  FLINT: 0.05
+  GUNPOWDER: 0.15
+  SPIDER_EYE: 0.08
+  ENDER_PEARL: 0.5
+  BLAZE_ROD: 1.0
+  BLAZE_POWDER: 0.4
+  SLIME_BALL: 0.25
+  MAGMA_CREAM: 0.35
+  GHAST_TEAR: 1.5
+  PHANTOM_MEMBRANE: 0.5
+  LEATHER: 0.2
+  FEATHER: 0.05
+  RABBIT_HIDE: 0.15
+  RABBIT_FOOT: 0.75
+  COD: 0.08
+  COOKED_COD: 0.1
+  SALMON: 0.1
+  COOKED_SALMON: 0.12
+  TROPICAL_FISH: 0.1
+  PUFFERFISH: 0.15
+  BEEF: 0.1
+  COOKED_BEEF: 0.15
+  PORKCHOP: 0.1
+  COOKED_PORKCHOP: 0.15
+  CHICKEN: 0.08
+  COOKED_CHICKEN: 0.12
+  MUTTON: 0.08
+  COOKED_MUTTON: 0.12
+  RABBIT: 0.08
+  COOKED_RABBIT: 0.12
+  GOLDEN_CARROT: 0.75
+  TURTLE_SCUTE: 0.8
+  ARMADILLO_SCUTE: 0.8
+
+# Diese Admin- und Operator-Hilfsmittel können nicht verkauft werden.
+protected-materials:
+  - BARRIER
+  - BEDROCK
+  - COMMAND_BLOCK
+  - CHAIN_COMMAND_BLOCK
+  - REPEATING_COMMAND_BLOCK
+  - COMMAND_BLOCK_MINECART
+  - STRUCTURE_BLOCK
+  - STRUCTURE_VOID
+  - JIGSAW
+  - DEBUG_STICK
+  - KNOWLEDGE_BOOK
+  - LIGHT
+  - SPAWNER
+  - TRIAL_SPAWNER
+  - VAULT
+
+messages:
+  disabled: "&cDas Verkaufs-Feature ist deaktiviert."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  no-permission: "&cDazu hast du keine Rechte."
+  usage: "&7Verwendung: &f/sell"
+  economy-unavailable: "&cDie Economy ist gerade nicht verfügbar."
+  nothing-to-sell: "&eLege zuerst verkaufbare Items in die oberen Felder."
+  protected-item: "&cDieses Item kann nicht verkauft werden."
+  menu-full: "&eIn den Einlagefeldern ist kein Platz mehr."
+  deposit-failed: "&cDer Betrag konnte nicht gutgeschrieben werden. Deine Items bleiben im Menü."
+  sold: "&aDu hast &e%items% Items &afür &e%amount% &averkauft."
+
+gui:
+  title: "&8Items verkaufen"
+  filler-material: GRAY_STAINED_GLASS_PANE
+  filler-name: " "
+  balance-slot: 45
+  balance-material: GOLD_INGOT
+  balance-name: "&6Kontostand"
+  balance-lore:
+    - "&7Guthaben: &e%balance%"
+  sell-slot: 49
+  sell-material: EMERALD
+  sell-name: "&aItems verkaufen"
+  sell-lore:
+    - "&7Verkauft nur die Items aus den oberen Feldern."
+    - "&eKlicken zum Verkaufen"
+  close-slot: 53
+  close-material: BARRIER
+  close-name: "&cSchließen"
+  close-lore:
+    - "&7Nicht verkaufte Items bekommst du zurück."

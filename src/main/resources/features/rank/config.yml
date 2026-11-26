@@ -1,0 +1,49 @@
+enabled: true
+
+permissions:
+  use: "system.rank.use"
+  admin: "system.rank"
+
+menu:
+  title: "&8Rangmarkt"
+  filler-material: "GRAY_STAINED_GLASS_PANE"
+  balance-name: "&aDeine Kristalle"
+  purchase-hint: "&eKlicke zum Kaufen"
+
+# LuckPerms-Gruppennamen müssen bereits existieren.
+# Beim Rangwechsel entfernt GreenAttack nur diese drei Rang-Eltern-Gruppen.
+# Alle anderen LuckPerms-Gruppen und Eltern-Gruppen bleiben unverändert.
+ranks:
+  natur:
+    name: "&aNatur"
+    group: "natur"
+    price: "50k"
+    material: "OAK_SAPLING"
+  premium:
+    name: "&6Premium"
+    group: "premium"
+    price: "150k"
+    material: "GOLD_INGOT"
+  titan:
+    name: "&bTitan"
+    group: "titan"
+    price: "250k"
+    material: "DIAMOND"
+
+messages:
+  disabled: "&cDer Rangmarkt ist deaktiviert."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  usage: "&7Verwendung: &f/rank &7oder &f/rank reload"
+  reloaded: "&aDer Rangmarkt wurde neu geladen."
+  purchase-pending: "&eDein Rangkauf wird bereits verarbeitet."
+  not-enough: "&cDu hast nicht genug Kristalle. &7Dein Kontostand: &b%balance%"
+  rank-check-failed: "&cDer Rang konnte nicht geprüft werden. Es wurden keine Kristalle abgezogen."
+  luckperms-unavailable: "&cLuckPerms ist nicht verfügbar. Es wurden keine Kristalle abgezogen."
+  group-missing: "&cDie LuckPerms-Gruppe &e%group% &cexistiert nicht. Es wurden keine Kristalle abgezogen."
+  user-unavailable: "&cDein LuckPerms-Profil ist noch nicht geladen. Es wurden keine Kristalle abgezogen."
+  rank-already-owned: "&eDu besitzt diesen Rang bereits oder hast schon einen höheren Rang."
+  crystal-save-failed: "&cDein Kristallkonto konnte nicht gespeichert werden."
+  purchase-success: "&aDu hast den Rang &f%rank% &afür &b%price% Kristalle &agekauft."
+  purchase-failed: "&cDer Rangkauf ist fehlgeschlagen. Kristalle wurden erstattet."
+  refund-failed: "&cDie Erstattung ist fehlgeschlagen. Bitte wende dich an ein Teammitglied."

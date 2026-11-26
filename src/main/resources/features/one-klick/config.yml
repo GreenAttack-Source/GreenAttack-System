@@ -1,0 +1,13 @@
+enabled: true
+
+# Maximalzahl zusammenhängender Blöcke inklusive des angeklickten Blocks.
+max-blocks-per-click: 128
+
+messages:
+  disabled: "&cDas One-Klick-Feature ist deaktiviert."
+  no-permission: "&cDazu hast du keine Rechte."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  usage: "&7Verwendung: &f/one-klick"
+  invalid-item: "&cHalte dafür eine Axt oder Spitzhacke in der Haupthand."
+  already-enabled: "&aOne-Klick ist für dieses Item bereits aktiviert."
+  enabled: "&aOne-Klick wurde für die gehaltene %type% aktiviert."

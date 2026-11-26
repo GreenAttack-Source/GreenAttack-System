@@ -1,0 +1,33 @@
+# Eigenständige Einstellungen für signierte Items.
+# Dieser Prefix ist absichtlich auch in den anderen Feature-Dateien vorhanden.
+enabled: true
+
+permissions:
+  use: "system.isign"
+  admin: "system.isign.admin"
+  # Alter Schreibfehler aus dem Skript bleibt für bestehende LuckPerms-Gruppen gültig.
+  legacy-admin: "system.isgn.admin"
+
+protected-rank-permissions:
+  - "group.supreme"
+  - "group.platin"
+  - "group.chill"
+  - "group.partner"
+  - "group.builder"
+  - "group.creator+"
+  - "group.creator"
+  - "group.vip"
+  - "group.content"
+  - "group.sup"
+  - "group.mod"
+
+messages:
+  disabled: "&cDieses Feature ist deaktiviert."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  usage: "&7Verwendung: &f/isign [Spieler]"
+  hold-item: "&cDu musst ein Item in der Hand halten."
+  admin-permission: "&cDu darfst nicht für andere Spieler signieren."
+  already-signed: "&cDer Name dieses Spielers steht bereits in der Item-Lore."
+  success-self: "&aDu hast das Item für dich signiert."
+  success-other: "&aDu hast das Item für &e%player% &asigniert."

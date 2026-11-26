@@ -1,0 +1,31 @@
+enabled: true
+
+permissions:
+  home: "system.home"
+  set: "system.home.set"
+  admin: "system.home.admin"
+  max-homes-prefix: "system.home."
+
+# Für gemeinsame Homes auf allen Paper-Backends dieselben Datenbankdaten eintragen.
+# server-id muss exakt dem Servernamen in der Velocity-Konfiguration entsprechen.
+# Bei leerem jdbc-url werden host, port und name für MySQL verwendet.
+# Für MariaDB jdbc-url im Format jdbc:mariadb://HOST:3306/DATENBANK eintragen.
+database:
+  enabled: false
+  jdbc-url: ""
+  host: ""
+  port: 3306
+  name: ""
+  user: ""
+  password: ""
+  server-id: ""
+  table-name: "greenattack_homes"
+  connection-timeout-ms: 3000
+
+messages:
+  disabled: "&cDas Home-Feature ist deaktiviert."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  database-error: "&cDeine Homes sind gerade nicht verfügbar. Bitte versuche es später erneut."
+  remote-home: "&eDieses Home liegt auf &6%server%&e. Verbinde dich dorthin über Velocity."
+  home-not-found: "&cHome &e%home% &cvon &e%player% &cwurde nicht gefunden."
+  home-not-found-local: "&cHome &e%home% &cvon &e%player% &cwurde nicht gefunden."

@@ -1,0 +1,48 @@
+enabled: true
+version: "3.7.5-compatible"
+
+settings:
+  language: "de-de"
+  command-prefix: "mpb"
+  kickPlayerOnSyncFail: true
+  # Fehlende Spieler-Datensätze automatisch bei der ersten Verbindung anlegen.
+  create-missing-player-data: true
+  # Nur wirksam, wenn create-missing-player-data deaktiviert ist.
+  no-entry-protection: false
+  admin-permission: "system.mysqlplayerbridge.admin"
+  suppress-warnings: false
+  server-id: ""
+
+database:
+  # Für MariaDB optional jdbc:mariadb://host:3306/datenbank eintragen.
+  jdbc-url: ""
+  host: ""
+  port: 3306
+  name: ""
+  user: ""
+  password: ""
+  main-table-name: "player_data"
+
+# Inventory, armor, offhand, GreenAttack/Vault balance and crystals are synced across backends.
+# All other data types remain disabled until enabled here.
+sync:
+  inventory: true
+  selected_hotbar_slot: true
+  enderChest: false
+  amorSlots: true
+  offhand: true
+  location: false
+  gamemode: false
+  exp: false
+  health: false
+  saturation: false
+  effects: false
+  advancements: false
+  statistics: false
+  vaultEconomy: true
+  kristall: true
+
+syncTask:
+  delay: 90
+
+messages: {} # Optional: Eigene Texte können hier überschrieben werden.

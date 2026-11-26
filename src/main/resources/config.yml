@@ -1,0 +1,96 @@
+# ============================================================
+# BERECHTIGUNG
+# Hier kannst du den Permission-Knoten für den vollen Server ändern.
+# OP-Status und system.admin vergeben diesen Knoten nicht automatisch.
+# Gruppen können diesen Knoten in LuckPerms direkt erhalten.
+# system.playerlimitbreak.admin umgeht das volle Limit auch bei hoher CPU-/RAM-Last.
+# Nach einer Änderung: /greenattack reload
+# ============================================================
+permission:
+  node: "system.playerlimitbreak"
+
+# ============================================================
+# GREENATTACK-ECONOMY
+# GreenAttack-System verwaltet Guthaben backend-lokal in
+# plugins/GreenAttack-System/features/economy/balances.yml.
+# Falls Vault installiert ist, stellt GreenAttack dieses Guthaben anderen Plugins bereit.
+# ============================================================
+economy:
+  enabled: true
+  provider: "greenattack"
+  starting-balance: 0.0
+  minimum-balance: 0.0
+  maximum-balance: 1000000000000.0
+  allow-negative: false
+  import-essentials-userdata: true
+  currency:
+    symbol: "$"
+    position: "suffix" # prefix oder suffix
+    decimal-places: 2
+    singular: "Dollar"
+    plural: "Dollar"
+
+# ============================================================
+# PLACEHOLDERAPI
+# Registriert GreenAttack-eigene Kristall- und Economy-Platzhalter.
+# Economy: %greenattack_eco_balance%, %greenattack_eco_balance_commas%,
+# %greenattack_eco_balance_fixed% und %greenattack_eco_balance_formatted%.
+# ============================================================
+placeholderapi:
+  enabled: true
+
+# ============================================================
+# CHAT-MELDUNGEN
+# Unterdrückt die normalen Paper-Beitritts- und Verlassensmeldungen.
+# ============================================================
+chat:
+  suppress-join-leave-messages: true
+  advancement-announcements: false
+
+# ============================================================
+# AUSLASTUNGSSCHUTZ
+# Der Bypass gilt nur, solange alle messbaren Werte unter den Grenzen liegen.
+# Werte sind Prozentangaben von 0 bis 100.
+# ============================================================
+limits:
+  max-cpu-percent: 85.0
+  max-jvm-memory-percent: 90.0
+  max-system-memory-percent: 92.0
+
+  # false = unbekannte Messwerte erlauben den Bypass; true = dann verweigern.
+  deny-if-metric-unavailable: false
+
+# ============================================================
+# SPIELERLIMIT DIESES BACKEND-SERVERS
+# -1 übernimmt das Limit aus server.properties.
+# /greenattack slots <anzahl> ändert es sofort und speichert den neuen Wert hier.
+# Jede Paper-Instanz verwaltet nur ihr eigenes Spielerlimit.
+# ============================================================
+slots:
+  max-players: -1
+
+# ============================================================
+# MELDUNGEN
+# &-Farbcodes sind erlaubt, zum Beispiel &a für Grün und &c für Rot.
+# ============================================================
+messages:
+  prefix: "&2GreenAttack-Plugin &8» &7"
+  reload-success: "&aKonfiguration wurde neu geladen."
+  slots-updated: "&aSpielerlimit dieses Servers auf &e%slots% &agesetzt."
+  overloaded: "&cDer Server ist derzeit stark ausgelastet. Bitte versuche es später erneut."
+
+# ============================================================
+# WEITERE FUNKTIONEN
+# Jede Funktion hat einen eigenen Ordner unter plugins/GreenAttack-System/features/.
+# Darin liegen config.yml und bei Bedarf featureeigene Datendateien.
+# Slots und PlayerLimitBreak bleiben in dieser Hauptkonfiguration.
+# ============================================================
+
+# ============================================================
+# DEBUG
+# ============================================================
+debug:
+  # true: Wenn einem Spieler ein system.*-Recht fehlt, steht im Server-Log, welches genau
+  # geprueft wurde ("Berechtigung verweigert: Name hat nicht 'system.code.admin' ..."),
+  # mit dem passenden /lp-Befehl zum Nachpruefen. Hilft bei "ich habe das Recht doch!".
+  log-permission-denials: false

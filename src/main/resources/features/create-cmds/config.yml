@@ -1,0 +1,50 @@
+enabled: true
+
+# ---------------------------------------------------------------------------
+# create-cmd's: eigene Befehle, komplett über diese Datei definiert.
+# Jeder Eintrag unter "commands:" wird beim Serverstart und bei /customcmd reload
+# als echter Spielbefehl angemeldet (mit eigenen Aliasen und eigener Berechtigung).
+#
+# Aufbau pro Befehl:
+#   <name>:
+#     aliases: [kurzform1, kurzform2]      # optional, ohne "/"
+#     permission: "mein.eigenes.recht"     # leer lassen = jeder darf den Befehl nutzen
+#     description: "Kurzbeschreibung"
+#     actions:                              # EINER oder MEHRERE Konsolenbefehle, der Reihe nach
+#       - "say %player% hat /discord benutzt"
+#       - "give %player% diamond 1"
+#
+# Platzhalter in actions: %player% (Name), %uuid%, %args% (alles nach dem Befehl).
+# Kollidiert ein Name/Alias mit einem schon vorhandenen Befehl (zum Beispiel /home), wird er
+# NICHT angemeldet; das steht dann im Server-Log.
+#
+# Schnell anlegen ohne diese Datei zu öffnen: /customcmd create <Name> <Befehl mit %player%>
+# (nur ein Konsolenbefehl, keine Aliase/Berechtigung; die kannst du danach hier ergänzen).
+# Verwalten: /customcmd list | reload | create | delete   (Recht: system.customcmd.admin)
+#
+# Beispiel (zum Ausprobieren die zwei # am Zeilenanfang entfernen):
+# commands:
+#   discord:
+#     aliases: [dc]
+#     permission: ""
+#     description: "Zeigt den Discord-Link."
+#     actions:
+#       - "tell %player% Unser Discord: https://discord.gg/dein-server"
+
+commands: {}
+
+messages:
+  no-permission: "&cDazu hast du keine Rechte."
+  usage: "&7Verwendung: &f/customcmd <list|reload|create <Name> <Befehl...>|delete <Name>>"
+  usage-hint: "&7Aliase, Berechtigung und mehrere Befehle pro Eintrag stellst du direkt in &ffeatures/create-cmds/config.yml &7ein."
+  usage-create: "&7Verwendung: &f/customcmd create <Name> <Konsolenbefehl mit %player%>"
+  usage-delete: "&7Verwendung: &f/customcmd delete <Name>"
+  invalid-name: "&cDer Befehlsname darf nur Kleinbuchstaben, Zahlen, _ und - enthalten (2 bis 32 Zeichen)."
+  already-exists: "&cDen Befehl &e/%command% &cgibt es schon."
+  unknown-command: "&cDen Befehl &e/%command% &cgibt es nicht."
+  reloaded: "&aEigene Befehle wurden neu geladen und angemeldet."
+  created: "&aBefehl &e/%command% &awurde erstellt und angemeldet."
+  deleted: "&aBefehl &e/%command% &awurde gelöscht."
+  list-header: "&aEigene Befehle:"
+  list-line: "&8- &f/%command%"
+  list-empty: "&7Es sind noch keine eigenen Befehle angemeldet."

@@ -1,0 +1,31 @@
+enabled: true
+
+permissions:
+  vanish: "system.vanish"
+  vanish-use: "system.vanish.use"
+  vanish-see: "system.vanish.see"
+  invsee: "system.invsee"
+  invsee-modify: "system.invsee.modify"
+  ecsee: "system.ecsee"
+  ecsee-modify: "system.ecsee.modify"
+
+gui:
+  invsee-title: "&8Player: &e%player%"
+  ecsee-title: "&8Endertruhe: &e%player%"
+  clear-inventory-name: "&c&lINVENTAR LÖSCHEN"
+  clear-ecsee-name: "&c&lENDERTRUHE LEEREN"
+
+messages:
+  disabled: "&cDieses Feature ist deaktiviert."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  usage-vanish: "&7Verwendung: &f/vanish"
+  usage-invsee: "&7Verwendung: &f/inv <Spieler>"
+  usage-ecsee: "&7Verwendung: &f/ecsee <Spieler>"
+  player-not-found: "&cDieser Spieler ist auf diesem Server nicht online."
+  vanish-on: "&aDu bist jetzt unsichtbar."
+  vanish-off: "&aDu bist wieder sichtbar."
+  invsee-opened: "&aDu siehst jetzt das Inventar von &e%player%&a."
+  inventory-cleared: "&aDas Inventar von &e%player% &awurde gelöscht."
+  enderchest-cleared: "&aDie Endertruhe von &e%player% &awurde geleert."
+  ecsee-opened: "&aDu siehst jetzt die Endertruhe von &e%player%&a."

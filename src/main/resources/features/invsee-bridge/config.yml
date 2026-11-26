@@ -1,0 +1,24 @@
+enabled: true
+
+# ---------------------------------------------------------------------------
+# /invsee und /ecsee funktionieren weiterhin wie bisher, wenn der Spieler online ist.
+# Ist er offline, übernimmt dieses Feature und ruft stattdessen OpenInv auf
+# (https://modrinth.com/plugin/openinv). OpenInv muss dafür zusätzlich auf diesem
+# Server installiert sein, sonst kommt eine Meldung mit einem Hinweis darauf.
+#
+# Dein system.invsee / system.ecsee-Recht entscheidet weiterhin, ob überhaupt
+# delegiert wird. OpenInv prüft danach zusätzlich seine EIGENEN Rechte
+# (siehe OpenInv-Dokumentation), beide Prüfungen müssen also durchgehen.
+#
+# Die Befehle werden mit vorangestelltem Plugin-Namen ausgeführt (openinv:openinv),
+# damit es keine Rolle spielt, ob "invsee" als Alias irgendwo anders vergeben ist.
+# Falls dein OpenInv andere Befehlsnamen verwendet, trag sie hier ein.
+# %player% wird durch den Zielspieler ersetzt.
+# ---------------------------------------------------------------------------
+openinv-inventory-command: "openinv:openinv %player%"
+openinv-enderchest-command: "openinv:openender %player%"
+
+messages:
+  delegating: "&7%player% ist offline, öffne über OpenInv ..."
+  openinv-missing: "&cOpenInv ist nicht installiert. %player%s Inventar kann offline nicht geöffnet werden. Siehe https://modrinth.com/plugin/openinv"
+  player-unknown: "&cDen Spieler &e%player% &chat es nie gegeben."

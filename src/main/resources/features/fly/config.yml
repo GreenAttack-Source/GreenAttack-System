@@ -1,0 +1,25 @@
+enabled: true
+
+# Worlds where normal personal fly is blocked. Players with system.fly.admin
+# are exempt. Use the exact world folder/name (case-insensitive), for example:
+# blocked-worlds:
+#   - world_nether
+blocked-worlds:
+  - Farmwelt-1
+  - Farmwelt-1_nether
+  - Farmwelt-1_the_end
+
+messages:
+  disabled: "&cDas Fly-Feature ist deaktiviert."
+  no-permission: "&cDazu hast du keine Rechte."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  usage: "&7Verwendung: &f/fly"
+  usage-other: "&7Verwendung: &f/fly &7oder &f/fly <Spieler>"
+  player-not-found: "&cDieser Spieler ist auf diesem Server nicht online."
+  world-blocked: "&cFliegen ist in dieser Welt deaktiviert."
+  blocked-mode: "&c/fly ist nur im Überlebens- oder Abenteuermodus verfügbar."
+  enabled-fly: "&aFliegen wurde eingeschaltet."
+  disabled-fly: "&cFliegen wurde ausgeschaltet."
+  enabled-other: "&aFly wurde für &e%player% &aeingeschaltet."
+  disabled-other: "&cFly wurde für &e%player% &causgeschaltet."
+  disabled-booster-active: "&eDein persönliches /fly ist ausgeschaltet; der Fly Booster gewährt aber weiterhin Flug."

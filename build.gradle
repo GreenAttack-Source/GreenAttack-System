@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+}
+
+group = 'de.greenattack'
+version = '3.3'
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://repo.helpch.at/releases' }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:26.3.build.+'
+    compileOnly('com.github.MilkBowl:VaultAPI:1.7') {
+        exclude group: 'org.bukkit', module: 'bukkit'
+    }
+    compileOnly 'me.clip:placeholderapi:2.12.3'
+    compileOnly 'net.luckperms:api:5.5'
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion(25)
+    targetCompatibility = JavaVersion.toVersion(25)
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 25
+    options.encoding = 'UTF-8'
+}
+
+processResources {
+    filteringCharset = 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand(version: project.version)
+    }
+}
+
+jar {
+    archiveBaseName = 'GreenAttack-System'
+    archiveFileName = "GreenAttack-System-${project.version}.jar"
+    destinationDirectory = layout.projectDirectory.dir('lib')
+}
+
+tasks.named('sourcesJar') {
+    archiveFileName = "GreenAttack-System-${project.version}-sources.jar"
+    destinationDirectory = layout.projectDirectory.dir('lib')
+}

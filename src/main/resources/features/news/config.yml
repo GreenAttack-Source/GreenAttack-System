@@ -1,0 +1,36 @@
+# Eigenständige Einstellungen für Neuigkeiten.
+enabled: true
+
+permissions:
+  view: "system.news.view"
+  config: "system.news.config"
+
+book:
+  title: "GreenAttack News"
+  author: "GreenAttack"
+  header: "&a&lGreenAttack Neuigkeiten:"
+  # %number% wird durch die laufende Nummer und %text% durch den News-Text ersetzt.
+  entry-format: "&7%number%. &r%text%"
+  # Abstand zwischen Einträgen; \n wird als Zeilenumbruch interpretiert.
+  entry-separator: "\n\n"
+
+messages:
+  disabled: "&cDieses Feature ist deaktiviert."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  no-news: "&7Derzeit gibt es keine Neuigkeiten."
+  player-only: "&cNur Spieler können das News-Buch öffnen."
+  book-error: "&cDas News-Buch konnte nicht erstellt werden."
+  added: "&aNeuigkeit wurde hinzugefügt."
+  updated: "&aNeuigkeit &e%index% &awurde geändert."
+  deleted: "&aNeuigkeit Nummer &e%index% &awurde gelöscht."
+  cleared: "&aAlle Neuigkeiten wurden gelöscht."
+  invalid-index: "&cBitte gib eine vorhandene Nummer aus der News-Liste an."
+  entry-too-long: "&cDieser News-Eintrag passt nicht auf eine Buchseite. Er wurde nicht gespeichert."
+  too-many-pages: "&cDie Neuigkeiten überschreiten die Minecraft-Buchgrenze von 100 Seiten. Änderung nicht gespeichert."
+  usage: "&7Verwendung: &f/newsconfig <add <Text>|set <Nummer> <Text>|delete <Nummer>|clear>"
+  usage-add: "&7Verwendung: &f/newsconfig add <Text>"
+  usage-set: "&7Verwendung: &f/newsconfig set <Nummer> <Text>"
+  usage-delete: "&7Verwendung: &f/newsconfig delete <Nummer>"
+
+news:
+  lines: []

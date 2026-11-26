@@ -1,0 +1,35 @@
+enabled: true
+
+messages:
+  disabled: "&cDas Economy-Feature ist deaktiviert."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  no-permission: "&cDazu hast du keine Rechte."
+  usage: "&7Verwendung: &f/pay <Spieler> <Betrag> &8(z.B. 1k = 1.000, 1m = 1.000.000)"
+  info-usage: "&7Verwendung: &f/payinfo [Anzahl]"
+  eco-usage: "&7Verwendung: &f/eco <give|take|set|reset|balance> <Spieler> [Betrag] &8(1k = 1.000, 1m = 1.000.000)"
+  target-not-online: "&cSpieler &e%player% &cist auf diesem Server nicht online."
+  unknown-player: "&cSpieler &e%player% &cwurde nicht gefunden."
+  self-payment: "&cDu kannst dir selbst kein Geld senden."
+  invalid-amount: "&cGib einen positiven Betrag an, z.B. 1000, 1k oder 1m."
+  economy-unavailable: "&cDie Economy ist gerade nicht verfügbar."
+  not-enough-money: "&cDu hast nicht genug Geld."
+  payment-failed: "&cDie Zahlung konnte nicht abgeschlossen werden."
+  paid-sender: "&aDu hast &e%player% &a%amount% gesendet."
+  paid-target: "&aDu hast von &e%player% &a%amount% erhalten."
+  balance-self: "&7Dein Guthaben: &a%balance%"
+  balance-other: "&e%player% &7hat &a%balance%&7."
+  eco-give: "&a%player% erhielt &e%amount%&a. Neuer Kontostand: &e%balance%"
+  eco-take: "&e%amount% &awurden von %player% abgezogen. Neuer Kontostand: &e%balance%"
+  eco-set: "&aGuthaben von &e%player% &aauf &e%balance% &agesetzt."
+  eco-reset: "&aGuthaben von &e%player% &aauf &e0 &azurückgesetzt."
+  operation-failed: "&cDas Guthaben konnte nicht geändert oder gespeichert werden."
+  baltop-header: "&6Top Geld"
+  baltop-entry: "&e%position%. &f%player% &7- &a%balance%"
+  baltop-empty: "&eEs gibt noch keine Konten."
+  log-empty: "&eEs wurden noch keine Zahlungen protokolliert."
+  log-header: "&6Letzte Zahlungen auf diesem Server:"
+  log-entry: "&8[%time%] &e%sender% &7→ &b%target% &8| &a%amount%"
+
+logging:
+  max-entries: 500
+  display-limit: 10

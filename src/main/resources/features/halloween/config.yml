@@ -1,0 +1,39 @@
+enabled: true
+
+permissions:
+  user: "system.halloween.user"
+  set: "system.halloween.set"
+  reset: "system.halloween.reset"
+  admin: "system.halloween.admin"
+
+head:
+  display-name: "&c&lHalloween-Kopf"
+  lore: "&7Platziere diesen Kopf als Event-Kopf."
+  # Wird mit /halloween set skull aus einem Spieler-Kopf in deiner Hand gesetzt.
+
+gui:
+  title: "&c&lHalloween"
+
+reward:
+  completion-amount: "25k"
+
+messages:
+  disabled: "&cDieses Feature ist deaktiviert."
+  no-permission: "&cDazu hast du keine Berechtigung."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  usage: "&cNutze: &e/halloween [set [skull]|reset]"
+  progress: "&7Du hast &e%found%&7 von &e%total%&7 Halloween-Köpfen gefunden."
+  head-given: "&aDu hast einen markierten Halloween-Kopf erhalten. Platziere ihn, um ihn zum Event hinzuzufügen."
+  skull-invalid: "&cHalte einen Spieler-Kopf (PLAYER_HEAD) in deiner Haupthand."
+  skull-saved: "&aDer Spieler-Kopf aus deiner Hand ist jetzt die Vorlage für &e/halloween set&a."
+  config-save-failed: "&cDie Kopf-Vorlage konnte nicht gespeichert werden."
+  head-dropped: "&eDein Inventar war voll. Der Halloween-Kopf wurde neben dir abgelegt."
+  head-registered: "&aDer Kopf wurde als Halloween-Event-Kopf gespeichert."
+  head-found: "&aHalloween-Kopf gefunden! (&e%found%&a/&e%total%&a)"
+  already-collected: "&eDiesen Halloween-Kopf hast du bereits gefunden."
+  reward-paid: "&6Alle Halloween-Köpfe gefunden! &aDu erhältst &e%amount%&a."
+  reward-invalid: "&cDie Halloween-Belohnung in features/halloween/config.yml ist ungültig."
+  reward-economy-unavailable: "&cDas GreenAttack-Economy-System ist gerade nicht verfügbar."
+  reward-failed: "&cDie Belohnung konnte nicht ausgezahlt werden. Versuche es erneut."
+  save-failed: "&cDie Halloween-Daten konnten nicht gespeichert werden."
+  reset: "&aHalloween wurde zurückgesetzt. &e%heads%&a Köpfe wurden entfernt und alle Fortschritte sowie Belohnungen zurückgesetzt."

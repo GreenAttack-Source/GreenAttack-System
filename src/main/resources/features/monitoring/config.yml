@@ -1,0 +1,46 @@
+enabled: true
+
+permissions:
+  use: "system.monitoring.use"
+  admin: "system.monitoring.admin"
+
+default-format: "ping tps ram"
+global-performance-mode: false
+formats: {}
+
+actionbar:
+  normal-format: "&a&lGreenAttack &8» %content%"
+  performance-format: "&e&l⚡ %content% &e&l⚡"
+
+elements:
+  ping: "&7Ping: &a%value%ms"
+  tps: "&7TPS: &a%value%"
+  mspt: "&7MSPT: &a%value%ms"
+  cpu: "&7CPU: &a%value%"
+  ram: "&7RAM: &a%used%GB &8/ &a%max%GB"
+  time: "&7Zeit: &a%value%"
+  location: "&7Pos: &a%x%, %y%, %z%"
+  direction: "&7Richtung: &a%value%"
+  online: "&7Online: &a%online%&8/&a%max%"
+
+messages:
+  disabled: "&cDieses Feature ist deaktiviert."
+  no-permission: "&a&lGreenAttack &8» &cDazu hast du keine Rechte!"
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  enabled-by-player: "&7Actionbar-Monitoring wurde &aaktiviert &7(Standard: ping tps ram)."
+  disabled-by-player: "&7Actionbar-Monitoring wurde &cdeaktiviert&7."
+  reset: "&7Dein Monitoring wurde auf Standard zurückgesetzt (&aping tps ram&7)."
+  layout-updated: "&7Actionbar-Monitoring angepasst auf: &a%format%"
+  invalid-element: "&cUnbekanntes Element: &e%element%&c."
+  usage: "&7/monitoring [help|off|reset|<elemente>] — Elemente: ping tps mspt cpu ram zeit loc dir online"
+  performance-enabled: "&e&l⚡ Globaler Performance-Anzeigemodus wurde AKTIVIERT!"
+  performance-disabled: "&c&l⚡ Globaler Performance-Anzeigemodus wurde DEAKTIVIERT!"
+  help:
+    - "&a&lGreenAttack &8» &7&lMonitoring Hilfe"
+    - "&8» &eNutzung:"
+    - "   &8- &f/monitoring &7Schaltet das Monitoring um"
+    - "   &8- &f/monitoring off &7Schaltet es aus"
+    - "   &8- &f/monitoring reset &7Setzt das Layout zurück"
+    - "   &8- &f/monitoring <elemente> &7Legt die Reihenfolge fest"
+    - "   &8- &f/performance &7Schaltet den globalen Anzeigemodus um"
+    - "&8» &7Elemente: ping, tps, mspt, cpu, ram, zeit, loc, dir, online"

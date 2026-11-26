@@ -1,0 +1,74 @@
+# Eigenständige Einstellungen für Teleport-Befehle.
+enabled: true
+
+permissions:
+  request: "system.tpa"
+  request-here: "system.tpa.here"
+  auto: "system.tpa.auto"
+  admin: "system.tpa.admin"
+  teleport: "system.tp"
+  teleport-here: "system.tp.here"
+
+lookup:
+  history-size: 100
+  display-entries: 10
+
+# Die Live-Spielerliste und serverübergreifende Teleports laufen über GreenAttack-System Velocity.
+# Mit aktivierter Datenbank werden Anfragen, Auto-Annahme und Teleport-Verlauf backendübergreifend gespeichert.
+# Dafür auf allen Paper-Backends dieselbe Datenbank und je Backend eine eindeutige server-id verwenden.
+# Bei leerem jdbc-url werden host, port und name für MySQL verwendet.
+# Für MariaDB jdbc-url im Format jdbc:mariadb://HOST:3306/DATENBANK eintragen.
+database:
+  enabled: false
+  jdbc-url: ""
+  host: ""
+  port: 3306
+  name: ""
+  user: ""
+  password: ""
+  server-id: ""
+  connection-timeout-ms: 3000
+
+request:
+  # 0 deaktiviert das automatische Ablaufen von Anfragen.
+  expires-seconds: 0
+
+buttons:
+  accept: "&a[Annehmen]"
+  deny: "&c[Ablehnen]"
+button-separator: " &7| "
+
+messages:
+  disabled: "&cDieses Feature ist deaktiviert."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  player-not-found: "&cDieser Spieler ist nicht online."
+  cannot-target-self: "&cDu kannst dich nicht selbst auswählen."
+  request-sent: "&aTeleport-Anfrage an &e%player% &agesendet."
+  request-received: "&e%player% &amöchte sich zu dir teleportieren."
+  request-here-received: "&e%player% &amöchte dich zu sich teleportieren."
+  request-actions: "&a[Annehmen] &7| &c[Ablehnen]"
+  request-accepted: "&aTeleport-Anfrage von &e%player% &aangenommen."
+  request-accepted-by: "&e%player% &ahat deine Teleport-Anfrage angenommen."
+  request-denied: "&cTeleport-Anfrage von &e%player% &cabgelehnt."
+  request-denied-by: "&e%player% &chat deine Teleport-Anfrage abgelehnt."
+  no-request: "&cDu hast keine offene Teleport-Anfrage."
+  request-expired: "&cDiese Teleport-Anfrage ist abgelaufen."
+  auto-enabled: "&aAutomatisches Annehmen von TPA-Anfragen ist aktiviert."
+  auto-disabled: "&cAutomatisches Annehmen von TPA-Anfragen ist deaktiviert."
+  teleported: "&aTeleportiert."
+  usage-tpa: "&7Verwendung: &f/tpa <Spieler>"
+  usage-tpahere: "&7Verwendung: &f/tpahere <Spieler>"
+  usage-tp: "&7Verwendung: &f/tp <Spieler> [Zielspieler]"
+  usage-tphere: "&7Verwendung: &f/tphere <Spieler>"
+  usage-accept: "&7Verwendung: &f/tpaaccept"
+  usage-cancel: "&7Verwendung: &f/tpacancel"
+  usage-auto: "&7Verwendung: &f/tpaauto"
+  lookup-header: "&6Letzte Teleports:"
+  lookup-empty: "&7Es wurden noch keine Teleports gespeichert."
+  lookup-entry: "&7[%time%] &e%player% &7wurde von &e%by% &7zu &e%target% &7teleportiert &8(%type%)"
+  lookup-usage: "&7Verwendung: &f/tpalookup"
+  teleport-failed: "&cDer Teleport ist fehlgeschlagen."
+  database-error: "&cDie Teleport-Anfrage ist gerade nicht verfügbar. Bitte versuche es später erneut."
+  teleport-here-success: "&e%player% &awurde zu dir teleportiert."
+  teleport-success: "&e%player% &awurde zu &e%target% &ateleportiert."

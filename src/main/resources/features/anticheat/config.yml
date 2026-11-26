@@ -1,0 +1,21 @@
+enabled: true
+
+movement:
+  enabled: true
+  # Horizontal movement per server update that is treated as suspicious.
+  # Falling height is never included.
+  max-horizontal-step: 2.5
+
+xray:
+  enabled: true
+  # Alert only after several separate hidden ore finds in this time window.
+  alert-threshold: 3
+  window-seconds: 600
+  # Ores from one nearby vein count as a single find.
+  cluster-distance-blocks: 5.0
+  max-target-distance: 6.0
+  alert-cooldown-seconds: 60
+
+messages:
+  movement-warning: "&cUngewöhnlich schnelle Bewegung erkannt."
+  xray-alert: "&cX-Ray-Verdacht: &f%player% &7hat mehrere Erze ohne freie Sicht abgebaut (&e%count%&7 Funde)."

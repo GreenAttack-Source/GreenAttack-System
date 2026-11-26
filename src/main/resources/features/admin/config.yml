@@ -1,0 +1,11 @@
+enabled: true
+
+# Befehlseinstieg für serverweite Admin-Werkzeuge.
+permissions:
+  admin: system.admin
+
+messages:
+  disabled: "&cDas Admin-Feature ist derzeit deaktiviert."
+  no-permission: "&cDazu hast du keine Rechte."
+  usage-greenattack: "&7Verwendung: &f/greenattack reload &7oder &f/greenattack slots <anzahl>"
+  usage-slots: "&7Verwendung: &f/slots <anzahl>"

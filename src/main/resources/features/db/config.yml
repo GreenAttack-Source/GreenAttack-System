@@ -1,0 +1,20 @@
+enabled: true
+
+permissions:
+  use: "system.db.use"
+  add: "system.db.add"
+  admin: "system.db.admin"
+
+gui-title: "&8» &bItem-Datenbank"
+items: []
+
+messages:
+  disabled: "&cDieses Feature ist deaktiviert."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  hold-item: "&cDu musst ein Item in der Hand halten."
+  duplicate: "&cDieses Item ist bereits gespeichert."
+  added: "&aItem &e%item% &awurde hinzugefügt."
+  deleted: "&cDer Eintrag wurde gelöscht."
+  taken: "&aDu hast dir &e%item% &aherausgenommen."
+  usage: "&7Verwendung: &f/db &7oder &f/db hand"

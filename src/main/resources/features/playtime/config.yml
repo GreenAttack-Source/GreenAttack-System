@@ -1,0 +1,48 @@
+enabled: true
+# AFK beginnt nach dieser Inaktivitätszeit. Auf allen Backends denselben Wert nutzen.
+afk-timeout-seconds: 300
+timezone: "Europe/Berlin"
+save-interval-seconds: 60
+
+# Dieselben Datenbankwerte und Tabellennamen auf Lobby, Citybuild und Farmwelt eintragen.
+database:
+  enabled: false
+  jdbc-url: ""
+  host: ""
+  port: 3306
+  name: ""
+  user: ""
+  password: ""
+  table-name: "greenattack_playtime"
+  daily-table-name: "greenattack_playtime_daily"
+  connection-timeout-ms: 3000
+
+permissions:
+  use: "system.playtime.use"
+  admin: "system.playtime.admin"
+
+messages:
+  header: "&2&l-------- &e&lPlaytime/Spielzeit &2&l---------"
+  disabled: "&cDas Spielzeit-System ist deaktiviert."
+  unavailable: "&cDie Spielzeit ist gerade nicht verfügbar. Bitte versuche es später erneut."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  usage: "&7Verwendung: &f/playtime &7oder &f/playtime <Spieler>"
+  not-found: "&cZu &e%player% &cgibt es noch keine Spielzeitdaten."
+  self:
+    - "&7Mitglied seit: &b%member-since%"
+    - "&7Onlinezeit: &b%online-time%"
+    - "&7Spielzeit: &b%playtime%"
+    - "&7Kategorie:"
+    - "&7Heute: &b%today%"
+    - "&7Letzte 7 Tage: &b%last-7-days%"
+    - "&7Letzte 30 Tage: &b%last-30-days%"
+  other:
+    - "&7Spielzeit von &e%player%&7:"
+    - "&7Mitglied seit: &b%member-since%"
+    - "&7Onlinezeit: &b%online-time%"
+    - "&7Spielzeit: &b%playtime%"
+    - "&7Kategorie:"
+    - "&7Heute: &b%today%"
+    - "&7Letzte 7 Tage: &b%last-7-days%"
+    - "&7Letzte 30 Tage: &b%last-30-days%"

@@ -1,0 +1,214 @@
+enabled: true
+category-layout-version: 2
+
+permissions:
+  use: "system.market.use"
+  admin: "system.market.admin"
+
+# Wenig Bestand erhöht den Preis; viel Bestand senkt ihn.
+pricing:
+  minimum-multiplier: 0.5
+  maximum-multiplier: 2.0
+  sell-ratio: 0.55
+
+gui:
+  default-category: mining
+  category-title: "&2Markt &8» &7%category% &8(%page%/%pages%)"
+  search-results-title: "&2Markt &8» &7Suche: %query% &8(%page%/%pages%)"
+  category-click: "&eKlicke, um diese Kategorie zu öffnen."
+  category-selected: "&aAusgewählt"
+  sell-name: "&eZum Verkauf"
+  sell-lore: "&7Öffnet das Verkaufsmenü."
+  search-name: "&eItems suchen"
+  search-lore: "&7Klicke, um den Suchtext einzugeben."
+  search-title: "&2GreenAttack-Markt &8» &7Suche"
+  search-placeholder: "&7Suchbegriff eingeben"
+  search-result-name: "&aSuche: &f%query%"
+  balance-name: "&aDein Kontostand"
+  balance-lore: "&7Guthaben: &e%balance%"
+  previous-name: "&e← Vorherige Seite"
+  next-name: "&eNächste Seite →"
+  offer-lore:
+    - "&7Kaufpreis: &a%buy% &7pro Stück"
+    - "&7Verkaufspreis: &c%sell% &7pro Stück"
+    - "&7Marktbestand: &e%stock%"
+    - ""
+    - "&aLinksklick: 1 kaufen"
+    - "&aShift + Linksklick: Stack kaufen"
+    - "&cRechtsklick: 1 verkaufen"
+    - "&cShift + Rechtsklick: alle verkaufen"
+
+categories:
+  mining:
+    enabled: true
+    order: 0
+    name: "&bBergbau"
+    icon: DIAMOND_PICKAXE
+    items:
+      COBBLESTONE: {base-price: 0.08, initial-stock: 5000}
+      STONE: {base-price: 0.12, initial-stock: 4000}
+      DEEPSLATE: {base-price: 0.18, initial-stock: 2500}
+      COBBLED_DEEPSLATE: {base-price: 0.14, initial-stock: 3000}
+      TUFF: {base-price: 0.16, initial-stock: 1800}
+      GRANITE: {base-price: 0.12, initial-stock: 1400}
+      DIORITE: {base-price: 0.12, initial-stock: 1400}
+      ANDESITE: {base-price: 0.12, initial-stock: 1400}
+      DIRT: {base-price: 0.10, initial-stock: 3000}
+      SAND: {base-price: 0.25, initial-stock: 2000}
+      GRAVEL: {base-price: 0.18, initial-stock: 1500}
+      COAL: {base-price: 0.35, initial-stock: 1600}
+      RAW_COPPER: {base-price: 0.45, initial-stock: 1100}
+      COPPER_INGOT: {base-price: 0.75, initial-stock: 1000}
+      RAW_IRON: {base-price: 0.95, initial-stock: 900}
+      IRON_INGOT: {base-price: 1.50, initial-stock: 900}
+      RAW_GOLD: {base-price: 1.40, initial-stock: 700}
+      GOLD_INGOT: {base-price: 2.50, initial-stock: 700}
+      LAPIS_LAZULI: {base-price: 0.45, initial-stock: 900}
+      REDSTONE: {base-price: 0.40, initial-stock: 1500}
+      DIAMOND: {base-price: 12.00, initial-stock: 250}
+      EMERALD: {base-price: 8.00, initial-stock: 300}
+      AMETHYST_SHARD: {base-price: 0.60, initial-stock: 700}
+      PRISMARINE_SHARD: {base-price: 0.55, initial-stock: 800}
+      PRISMARINE_CRYSTALS: {base-price: 0.90, initial-stock: 500}
+
+  wood:
+    enabled: true
+    order: 1
+    name: "&6Holz"
+    icon: DIAMOND_AXE
+    items:
+      OAK_LOG: {base-price: 0.80, initial-stock: 1000}
+      SPRUCE_LOG: {base-price: 0.80, initial-stock: 1000}
+      BIRCH_LOG: {base-price: 0.80, initial-stock: 900}
+      JUNGLE_LOG: {base-price: 0.90, initial-stock: 700}
+      ACACIA_LOG: {base-price: 0.85, initial-stock: 800}
+      DARK_OAK_LOG: {base-price: 0.90, initial-stock: 800}
+      MANGROVE_LOG: {base-price: 1.00, initial-stock: 600}
+      CHERRY_LOG: {base-price: 1.00, initial-stock: 600}
+      PALE_OAK_LOG: {base-price: 1.00, initial-stock: 600}
+      OAK_PLANKS: {base-price: 0.22, initial-stock: 2000}
+      SPRUCE_PLANKS: {base-price: 0.22, initial-stock: 2000}
+      BIRCH_PLANKS: {base-price: 0.22, initial-stock: 1800}
+      JUNGLE_PLANKS: {base-price: 0.24, initial-stock: 1200}
+      ACACIA_PLANKS: {base-price: 0.24, initial-stock: 1400}
+      DARK_OAK_PLANKS: {base-price: 0.24, initial-stock: 1400}
+      MANGROVE_PLANKS: {base-price: 0.28, initial-stock: 1000}
+      CHERRY_PLANKS: {base-price: 0.28, initial-stock: 1000}
+      STICK: {base-price: 0.08, initial-stock: 2500}
+      BAMBOO: {base-price: 0.18, initial-stock: 1200}
+      BAMBOO_BLOCK: {base-price: 0.45, initial-stock: 800}
+      OAK_SAPLING: {base-price: 0.20, initial-stock: 800}
+      SPRUCE_SAPLING: {base-price: 0.20, initial-stock: 800}
+      BIRCH_SAPLING: {base-price: 0.20, initial-stock: 800}
+
+  combat:
+    enabled: true
+    order: 2
+    name: "&cKampf"
+    icon: DIAMOND_SWORD
+    items:
+      ROTTEN_FLESH: {base-price: 0.10, initial-stock: 1800}
+      BONE: {base-price: 0.30, initial-stock: 1500}
+      STRING: {base-price: 0.35, initial-stock: 1200}
+      GUNPOWDER: {base-price: 0.80, initial-stock: 900}
+      ENDER_PEARL: {base-price: 1.20, initial-stock: 600}
+      SLIME_BALL: {base-price: 0.70, initial-stock: 700}
+      LEATHER: {base-price: 0.45, initial-stock: 900}
+      FEATHER: {base-price: 0.15, initial-stock: 1200}
+      BLAZE_ROD: {base-price: 2.50, initial-stock: 400}
+      GHAST_TEAR: {base-price: 6.00, initial-stock: 200}
+      SPIDER_EYE: {base-price: 0.35, initial-stock: 700}
+      PHANTOM_MEMBRANE: {base-price: 1.25, initial-stock: 300}
+      ARROW: {base-price: 0.12, initial-stock: 1200}
+      SHIELD: {base-price: 4.00, initial-stock: 250}
+      BOW: {base-price: 3.50, initial-stock: 250}
+      CROSSBOW: {base-price: 5.00, initial-stock: 180}
+      TRIDENT: {base-price: 25.00, initial-stock: 50}
+      IRON_SWORD: {base-price: 3.00, initial-stock: 300}
+      DIAMOND_SWORD: {base-price: 20.00, initial-stock: 100}
+
+  food:
+    enabled: true
+    order: 3
+    name: "&eNahrung"
+    icon: DIAMOND_HOE
+    items:
+      WHEAT: {base-price: 0.30, initial-stock: 2000}
+      CARROT: {base-price: 0.35, initial-stock: 1600}
+      POTATO: {base-price: 0.30, initial-stock: 1600}
+      SUGAR_CANE: {base-price: 0.65, initial-stock: 1200}
+      CACTUS: {base-price: 0.55, initial-stock: 1000}
+      PUMPKIN: {base-price: 0.70, initial-stock: 800}
+      MELON_SLICE: {base-price: 0.10, initial-stock: 1500}
+      NETHER_WART: {base-price: 0.90, initial-stock: 700}
+      BEETROOT: {base-price: 0.35, initial-stock: 800}
+      BREAD: {base-price: 0.75, initial-stock: 1200}
+      COOKED_BEEF: {base-price: 1.60, initial-stock: 800}
+      COOKED_PORKCHOP: {base-price: 1.50, initial-stock: 800}
+      COOKED_CHICKEN: {base-price: 0.90, initial-stock: 900}
+      BAKED_POTATO: {base-price: 0.65, initial-stock: 1000}
+      GOLDEN_CARROT: {base-price: 1.40, initial-stock: 500}
+      APPLE: {base-price: 0.50, initial-stock: 900}
+      COOKED_COD: {base-price: 0.80, initial-stock: 600}
+      COOKED_SALMON: {base-price: 1.00, initial-stock: 600}
+      SWEET_BERRIES: {base-price: 0.30, initial-stock: 900}
+      GLOW_BERRIES: {base-price: 0.40, initial-stock: 700}
+
+  misc:
+    enabled: true
+    order: 4
+    name: "&aSonstiges"
+    icon: GRASS_BLOCK
+    items:
+      GLASS: {base-price: 0.35, initial-stock: 1200}
+      BRICKS: {base-price: 1.20, initial-stock: 500}
+      OBSIDIAN: {base-price: 1.50, initial-stock: 400}
+      NETHERRACK: {base-price: 0.08, initial-stock: 2500}
+      QUARTZ: {base-price: 0.75, initial-stock: 900}
+      GLOWSTONE_DUST: {base-price: 0.45, initial-stock: 800}
+      SOUL_SAND: {base-price: 0.45, initial-stock: 700}
+      CHORUS_FRUIT: {base-price: 0.40, initial-stock: 700}
+      REPEATER: {base-price: 0.90, initial-stock: 500}
+      COMPARATOR: {base-price: 1.20, initial-stock: 400}
+      PISTON: {base-price: 2.00, initial-stock: 400}
+      OBSERVER: {base-price: 2.50, initial-stock: 350}
+      HOPPER: {base-price: 5.00, initial-stock: 250}
+      REDSTONE_LAMP: {base-price: 1.50, initial-stock: 400}
+      CHEST: {base-price: 0.80, initial-stock: 900}
+      BARREL: {base-price: 1.10, initial-stock: 700}
+      ENDER_CHEST: {base-price: 20.00, initial-stock: 100}
+
+  special:
+    enabled: true
+    order: 5
+    name: "&dBesonderes"
+    icon: BEACON
+    items:
+      BEACON: {base-price: 300.00, initial-stock: 20}
+      NETHER_STAR: {base-price: 250.00, initial-stock: 30}
+      ELYTRA: {base-price: 300.00, initial-stock: 20}
+      TOTEM_OF_UNDYING: {base-price: 80.00, initial-stock: 40}
+      SHULKER_SHELL: {base-price: 16.00, initial-stock: 100}
+      NETHERITE_INGOT: {base-price: 140.00, initial-stock: 20}
+      NETHERITE_SCRAP: {base-price: 70.00, initial-stock: 64}
+      ENCHANTED_GOLDEN_APPLE: {base-price: 100.00, initial-stock: 25}
+      DRAGON_EGG: {base-price: 1000.00, initial-stock: 1}
+
+messages:
+  disabled: "&cDer Markt ist derzeit geschlossen."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  economy-unavailable: "&cDer Markt ist momentan nicht verfügbar."
+  no-categories: "&cDer Markt hat derzeit keine Kategorien."
+  usage: "&7Verwendung: &f/markt &7oder &f/markt <reload|reset [Kategorie]>"
+  reloaded: "&aDer Markt wurde neu geladen."
+  out-of-stock: "&c%item% ist momentan ausverkauft."
+  inventory-full: "&cIn deinem Inventar ist kein Platz für dieses Item."
+  not-enough-money: "&cDafür reicht dein Guthaben nicht. Preis: &e%price%"
+  no-items: "&cDu hast keine normalen %item% zum Verkaufen."
+  bought: "&aDu hast &e%amount%x %item% &afür &e%price% &agekauft."
+  sold: "&aDu hast &e%amount%x %item% &afür &e%price% &averkauft."
+  transaction-failed: "&cDer Handel ist fehlgeschlagen. Bitte versuche es erneut."
+  category-not-found: "&cKategorie &e%category% &cwurde nicht gefunden."
+  stock-reset: "&aDer gesamte Marktbestand wurde zurückgesetzt."
+  stock-reset-category: "&aDer Marktbestand der Kategorie &e%category% &awurde zurückgesetzt."

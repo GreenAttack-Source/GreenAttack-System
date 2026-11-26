@@ -1,0 +1,35 @@
+enabled: true
+
+# Add exact player names here to give those players their own spawn priority.
+# Create each player's spawn with /setspawn <playername>.
+player-priority: []
+
+# Add LuckPerms group names here, highest priority first.
+# Create each matching group spawn with /setspawn <groupname>.
+# No system.spawn.group.<group> permission is needed when LuckPerms is active.
+group-priority: []
+
+# Players without system.spawn.admin are sent to their configured spawn on every join.
+# Players with system.spawn.admin keep their last location when rejoining.
+respawn-at-spawn: true
+
+notify-target: true
+
+messages:
+  disabled: "&cDas Spawn-Feature ist deaktiviert."
+  no-permission: "&cDazu hast du keine Rechte."
+  no-other-permission: "&cDu darfst andere Spieler nicht teleportieren."
+  no-set-permission: "&cDu darfst den Spawn nicht setzen."
+  no-group-set-permission: "&cDu darfst keine Gruppenspawns setzen."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  spawn-usage: "&7Verwendung: &f/spawn [Spieler]"
+  setspawn-usage: "&7Verwendung: &f/setspawn [Gruppe]"
+  invalid-group: "&cDer Gruppenname darf nur Buchstaben, Zahlen, _ und - enthalten."
+  player-not-found: "&cSpieler &e%player% &cwurde nicht gefunden."
+  not-set: "&cDer Spawn wurde noch nicht gesetzt."
+  teleport-failed: "&cDer Teleport zum Spawn wurde abgebrochen."
+  save-failed: "&cDer Spawnpunkt konnte nicht gespeichert werden."
+  set: "&aSpawn für &e%group% &agesetzt."
+  teleported: "&aDu wurdest zum Spawn teleportiert."
+  sent-other: "&aDu hast &e%player% &azum Spawn teleportiert."
+  target-teleported: "&aDu wurdest zum Spawn teleportiert."
