@@ -1544,8 +1544,8 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
       }
       this.send(sender, this.msg("messages.roles-header", "&aRollen deines Clans:"));
       for (RoleData role : current.rolesOf(me.clanKey)) {
-         this.send(sender, this.msg("messages.roles-line", "&e%role% &7(Gewicht %weight%) &8- &f%perms%",
-            "role", role.name, "weight", Integer.toString(role.weight), "perms", this.permissionList(role)));
+         this.send(sender, this.msg("messages.roles-list-line", "&e%role% &7(Gewicht %weight%)",
+            "role", role.name, "weight", Integer.toString(role.weight)));
       }
    }
 

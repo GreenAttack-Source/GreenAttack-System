@@ -200,6 +200,7 @@ messages:
   role-system: "&cDie Rolle &e%role% &cist eine Standardrolle und kann so nicht geändert werden."
   role-weight-done: "&aDie Rolle &e%role% &ahat jetzt das Gewicht &e%value%&a."
   roles-header: "&aRollen deines Clans:"
+  roles-list-line: "&e%role% &7(Gewicht %weight%)"
   roles-line: "&e%role% &7(Gewicht %weight%) &8- &f%perms%"
   same-color: "&cDein Clan hat diese Farbe schon."
   same-name: "&cDein Clan heißt schon so."
