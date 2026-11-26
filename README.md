@@ -17,5 +17,3 @@ Building requires JDK 21 or newer. On Windows, run this from the repository fold
 The generated JAR is written to `lib/GreenAttack-System-3.4.jar`.
 
 The Paper server itself must use the Java version required by that Paper release: Java 21 for 1.21.11 and Java 25 for Paper 26.1 and newer.
-
-Clan owners start deletion with `/clan delete` and confirm it with `/clan confirm` within 60 seconds.
