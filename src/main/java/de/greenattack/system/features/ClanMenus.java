@@ -439,7 +439,7 @@ public final class ClanMenus {
          final String stored = ClanFeature.parseColor(entry[0]);
          boolean active = clan != null && clan.color.equalsIgnoreCase(stored);
          String shown = ClanFeature.legacyColor(stored).replace('§', '&') + entry[0];
-         this.put(holder, slot++, this.item(entry[1], shown, lines(active ? "&aAktuelle Farbe" : "&7Kosten: &b" + this.feature.colorCost(stored) + " Kristalle", "&7Vorschau: " + this.feature.formatTag(new ClanData(clan.key, clan.name, clan.tag, stored, clan.createdAt, clan.joinMode)))),
+         this.put(holder, slot++, this.item(entry[1], shown, lines(active ? "&aAktuelle Farbe" : "&7Kosten: &b" + this.feature.colorCost(stored) + " Kristalle", "&7Vorschau: " + this.feature.formatTag(new ClanData(clan.key, clan.name, clan.tag, stored, clan.tagStyle, clan.createdAt, clan.joinMode)))),
             (p, right) -> this.feature.buyColor(p, stored, () -> this.openColors(p)));
       }
       this.put(holder, 31, this.item("NAME_TAG", "&bEigene Hex-Farbe", lines("&7Klick, dann im Chat: &f#RRGGBB", "&7Kosten: &b" + this.feature.colorCost("#ffffff") + " Kristalle")),

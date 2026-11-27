@@ -332,7 +332,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
       ClanData clan = member == null ? null : current.clans.get(member.clanKey);
       if (this.isEnabled() && this.config.getBoolean("luckperms-suffix.enabled", true) && clan != null) {
          String format = this.config.getString("luckperms-suffix.format", " [%tag%]");
-         String coloredTag = legacyColor(clan.color) + clan.tag.toUpperCase(Locale.ROOT) + "§r";
+         String coloredTag = this.styledTag(clan) + "§r";
          String suffix = color(format.replace("%tag%", coloredTag));
          if (!suffix.isEmpty()) {
             desired = suffix;
@@ -529,7 +529,11 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
    }
 
    String formatTag(ClanData clan) {
-      return this.bracketColor + "[" + legacyColor(clan.color) + clan.tag.toUpperCase(Locale.ROOT) + this.bracketColor + "]§r";
+      return this.bracketColor + "[" + this.styledTag(clan) + this.bracketColor + "]§r";
+   }
+
+   private String styledTag(ClanData clan) {
+      return legacyColor(clan.color) + ("bold".equals(clan.tagStyle) ? "§l" : "") + clan.tag.toUpperCase(Locale.ROOT);
    }
 
    // ------------------------------------------------------------------ Befehle
@@ -659,6 +663,13 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
             }
             break;
          }
+         case "style": {
+            Player player = this.requirePlayer(sender);
+            if (player != null && this.requireArgs(sender, args, 2, "style <normal|bold>")) {
+               this.setTagStyle(player, args[1], null);
+            }
+            break;
+         }
          case "rename": {
             Player player = this.requirePlayer(sender);
             if (player != null && this.requireArgs(sender, args, 2, "rename <NeuerName>")) {
@@ -737,7 +748,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          "&f/clan info [Clan] &7| &f/clan members",
          "&f/clan list &7| &f/clan top", "&f/clan chat [Nachricht] &7| &f/cc <Nachricht>", "&f/clan kick <Spieler> &7| &f/clan setrole <Spieler> <Rolle>",
          "&f/clan roles &7| &f/clan role <create|delete|weight|perm|info> ...", "&f/clan home [Name] &7| &f/clan sethome|delhome <Name> &7| &f/clan homes",
-         "&f/clan color <Farbe> &7| &f/clan rename <Name> &7| &f/clan settag <Tag>", "&f/clan settings join <invite|close|open>",
+         "&f/clan color <Farbe> &7| &f/clan style <normal|bold> &7| &f/clan rename <Name> &7| &f/clan settag <Tag>", "&f/clan settings join <invite|close|open>",
          "&f/clan transfer <Spieler>"}) {
          this.send(sender, color(line));
       }
@@ -903,7 +914,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
       JoinMode mode = JoinMode.parse(this.config.getString("default-join-mode", "invite"));
       final UUID id = player.getUniqueId();
       final String playerName = player.getName();
-      final ClanData data = new ClanData(name.toLowerCase(Locale.ROOT), name, tag, this.defaultColor(), System.currentTimeMillis(), mode);
+      final ClanData data = new ClanData(name.toLowerCase(Locale.ROOT), name, tag, this.defaultColor(), "normal", System.currentTimeMillis(), mode);
       final Runnable refund = () -> this.refundMoney(player, cost);
       final String shownTag = tag;
 
@@ -1299,7 +1310,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          }
       }
       String created = new SimpleDateFormat("dd.MM.yyyy").format(new Date(clan.createdAt));
-      this.send(sender, this.msg("messages.info-header", "&aClan &e%clan% &7[%tag%&7]", "clan", clan.name, "tag", legacyColor(clan.color) + clan.tag.toUpperCase(Locale.ROOT)));
+      this.send(sender, this.msg("messages.info-header", "&aClan &e%clan% &7[%tag%&7]", "clan", clan.name, "tag", this.styledTag(clan)));
       this.send(sender, this.msg("messages.info-owner", "&7Owner: &f%owner%", "owner", owner));
       this.send(sender, this.msg("messages.info-status", "&7Gegründet: &f%created% &8| &7Beitritt: &f%mode%",
          "created", created, "mode", this.joinModeLabel(clan.joinMode)));
@@ -1865,6 +1876,75 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          this.finish(after);
       }, () -> {
          refund.run();
+         this.finish(after);
+      });
+   }
+
+   void setTagStyle(Player player, String requestedStyle, Runnable after) {
+      if (!this.hasFeaturePermission(player, COLOR_PERMISSION)) {
+         this.tell(player, "messages.no-permission", "&cDazu hast du keine Rechte.");
+         this.finish(after);
+         return;
+      }
+      String style = requestedStyle.toLowerCase(Locale.ROOT);
+      if (!style.equals("normal") && !style.equals("bold")) {
+         this.tell(player, "messages.invalid-style", "&cDer Clan-Tag-Stil muss &enormal &coder &ebold &csein.");
+         this.finish(after);
+         return;
+      }
+
+      Snapshot current = this.snapshot;
+      MemberData me = current.members.get(player.getUniqueId());
+      if (me == null) {
+         this.tell(player, "messages.not-in-clan", "&cDu bist in keinem Clan.");
+         this.finish(after);
+         return;
+      }
+      if (!current.can(me, "color")) {
+         this.tell(player, "messages.no-rights", "&cDazu hast du im Clan keine Rechte.");
+         this.finish(after);
+         return;
+      }
+      ClanData clan = current.clans.get(me.clanKey);
+      if (clan != null && clan.tagStyle.equals(style)) {
+         this.tell(player, "messages.same-style", "&cDein Clan nutzt diesen Tag-Stil bereits.");
+         this.finish(after);
+         return;
+      }
+
+      UUID id = player.getUniqueId();
+      this.async(player, storage -> {
+         Snapshot fresh = storage.loadSnapshot();
+         MemberData now = fresh.members.get(id);
+         if (now == null) {
+            return new Res("NOT_IN_CLAN", "", "");
+         }
+         if (!fresh.can(now, "color")) {
+            return new Res("NO_RIGHTS", "", "");
+         }
+         ClanData freshClan = fresh.clans.get(now.clanKey);
+         if (freshClan == null) {
+            return new Res("UNKNOWN_CLAN", now.clanKey, "");
+         }
+         if (freshClan.tagStyle.equals(style)) {
+            return new Res("SAME", style, "");
+         }
+         storage.setTagStyle(now.clanKey, style);
+         this.publishSnapshot(storage.loadSnapshot());
+         return new Res("OK", style, now.clanKey);
+      }, result -> {
+         switch (result.status) {
+            case "OK":
+               this.tell(player, "messages.style-done", "&aDer Clan-Tag-Stil ist jetzt &e%style%&a. Die Änderung ist kostenlos.", "style", result.a);
+               this.sendToClan(result.b, this.msg("messages.style-notify", "&7Der Clan-Tag-Stil wurde kostenlos auf &e%style% &7gestellt.", "style", result.a), id);
+               break;
+            case "SAME":
+               this.tell(player, "messages.same-style", "&cDein Clan nutzt diesen Tag-Stil bereits.");
+               break;
+            default:
+               this.commonError(player, result);
+               break;
+         }
          this.finish(after);
       });
    }
@@ -2466,7 +2546,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          MemberData me = current.members.get(player.getUniqueId());
          if (args.length == 1) {
             options.addAll(Arrays.asList("menu", "create", "invite", "accept", "deny", "join", "leave", "delete", "info", "list", "top", "members", "chat", "kick", "setrole", "roles",
-               "role", "color", "rename", "settag", "settings", "home", "sethome", "delhome", "homes", "transfer", "help"));
+               "role", "color", "style", "rename", "settag", "settings", "home", "sethome", "delhome", "homes", "transfer", "help"));
             PendingDeleteConfirmation pending = this.pendingDeleteConfirmations.get(player.getUniqueId());
             if (me == null || !ClanModel.OWNER.equals(me.roleKey) || pending == null || !pending.clanKey().equals(me.clanKey)
                || (!player.hasPermission(DELETE_CONFIRM_BYPASS_PERMISSION) && pending.expiresAt() <= System.currentTimeMillis())) {
@@ -2502,6 +2582,9 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
                   break;
                case "color":
                   options.addAll(NAMED_COLORS.keySet());
+                  break;
+               case "style":
+                  options.addAll(Arrays.asList("normal", "bold"));
                   break;
                case "role":
                   options.addAll(Arrays.asList("create", "delete", "weight", "perm", "info"));

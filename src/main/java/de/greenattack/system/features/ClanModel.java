@@ -167,14 +167,16 @@ final class ClanModel {
       final String name;
       final String tag;
       final String color;
+      final String tagStyle;
       final long createdAt;
       final JoinMode joinMode;
 
-      ClanData(String key, String name, String tag, String color, long createdAt, JoinMode joinMode) {
+      ClanData(String key, String name, String tag, String color, String tagStyle, long createdAt, JoinMode joinMode) {
          this.key = key;
          this.name = name;
          this.tag = tag;
          this.color = color;
+         this.tagStyle = "bold".equalsIgnoreCase(tagStyle) ? "bold" : "normal";
          this.createdAt = createdAt;
          this.joinMode = joinMode == null ? JoinMode.INVITE : joinMode;
       }

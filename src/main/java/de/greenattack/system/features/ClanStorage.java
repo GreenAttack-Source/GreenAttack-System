@@ -44,6 +44,8 @@ interface ClanStorage {
 
    void setColor(String clanKey, String color) throws Exception;
 
+   void setTagStyle(String clanKey, String style) throws Exception;
+
    /** false, wenn der Tag schon vergeben ist. */
    boolean setTag(String clanKey, String tag, String tagKey) throws Exception;
 
@@ -168,7 +170,7 @@ interface ClanStorage {
          try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + this.clans + " ("
                + "clan_key VARCHAR(24) NOT NULL, clan_name VARCHAR(24) NOT NULL, tag VARCHAR(8) NOT NULL, tag_key VARCHAR(8) NOT NULL, "
-               + "color VARCHAR(16) NOT NULL, created_at BIGINT NOT NULL, "
+               + "color VARCHAR(16) NOT NULL, tag_style VARCHAR(16) NOT NULL DEFAULT 'normal', created_at BIGINT NOT NULL, "
                + "join_mode VARCHAR(8) NOT NULL DEFAULT 'invite', "
                + "PRIMARY KEY (clan_key), UNIQUE KEY uk_tag_key (tag_key)) DEFAULT CHARSET=utf8mb4");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + this.members + " ("
@@ -188,6 +190,13 @@ interface ClanStorage {
             // Migration von älteren Tabellen (vor Rollen/Beitrittsmodus)
             try {
                statement.executeUpdate("ALTER TABLE " + this.clans + " ADD COLUMN join_mode VARCHAR(8) NOT NULL DEFAULT 'invite'");
+            } catch (SQLException exception) {
+               if (exception.getErrorCode() != 1060 && !"42S21".equals(exception.getSQLState())) {
+                  throw exception;
+               }
+            }
+            try {
+               statement.executeUpdate("ALTER TABLE " + this.clans + " ADD COLUMN tag_style VARCHAR(16) NOT NULL DEFAULT 'normal'");
             } catch (SQLException exception) {
                if (exception.getErrorCode() != 1060 && !"42S21".equals(exception.getSQLState())) {
                   throw exception;
@@ -278,11 +287,11 @@ interface ClanStorage {
       public Snapshot loadSnapshot() throws SQLException {
          return this.read(connection -> {
             Map<String, ClanData> clanMap = new LinkedHashMap<>();
-            try (PreparedStatement statement = connection.prepareStatement("SELECT clan_key, clan_name, tag, color, created_at, join_mode FROM " + this.clans);
+            try (PreparedStatement statement = connection.prepareStatement("SELECT clan_key, clan_name, tag, color, tag_style, created_at, join_mode FROM " + this.clans);
                ResultSet rows = statement.executeQuery()) {
                while (rows.next()) {
                   clanMap.put(rows.getString(1), new ClanData(rows.getString(1), rows.getString(2), rows.getString(3), rows.getString(4),
-                     rows.getLong(5), JoinMode.parse(rows.getString(6))));
+                     rows.getString(5), rows.getLong(6), JoinMode.parse(rows.getString(7))));
                }
             }
             List<String> roleClans = new ArrayList<>();
@@ -416,6 +425,11 @@ interface ClanStorage {
       @Override
       public void setColor(String clanKey, String color) throws SQLException {
          this.read(connection -> execute(connection, "UPDATE " + this.clans + " SET color = ? WHERE clan_key = ?", color, clanKey));
+      }
+
+      @Override
+      public void setTagStyle(String clanKey, String style) throws SQLException {
+         this.read(connection -> execute(connection, "UPDATE " + this.clans + " SET tag_style = ? WHERE clan_key = ?", style, clanKey));
       }
 
       @Override
