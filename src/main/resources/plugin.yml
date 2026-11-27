@@ -427,9 +427,6 @@ permissions:
   claim.settings.title:
     description: Allows changing the title of your own claim.
     default: true
-  claim.settings.subtitle:
-    description: Allows changing the subtitle of your own claim.
-    default: true
   claim.info:
     description: Allows viewing information about the current claim.
     default: true
@@ -447,14 +444,12 @@ permissions:
       claim.trust.remove: true
       claim.trust.list: true
       claim.settings.title: true
-      claim.settings.subtitle: true
       claim.info: true
       claim.help: true
       claim.admin.bypass: true
       claim.admin.unclaim: true
       claim.admin.trust: true
       claim.admin.settings.title: true
-      claim.admin.settings.subtitle: true
       claim.admin.unlimited: true
   claim.admin.bypass:
     description: Allows bypassing protection on other players' claims.
@@ -467,9 +462,6 @@ permissions:
     default: false
   claim.admin.settings.title:
     description: Allows changing the title of another player's claim.
-    default: false
-  claim.admin.settings.subtitle:
-    description: Allows changing the subtitle of another player's claim.
     default: false
   claim.admin.unlimited:
     description: Allows creating an unlimited number of claims.

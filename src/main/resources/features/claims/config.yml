@@ -20,10 +20,11 @@ actionbar:
   # Wird nur bei zusammenhängenden Claims desselben Besitzers angezeigt.
   multiple-claims-format: " &8(&f%count%&7 verbundene Claims&8)"
 
-# Diese Standardtexte erscheinen beim Betreten eines Claims, sofern dort kein eigener Text gesetzt ist.
+# Der Titel kann je Claim mit /claim settings title angepasst werden. Untertitel sind zentral festgelegt.
 defaults:
   title: "&2Claim von %owner%"
   subtitle: "&7Dieser Chunk ist geschützt."
+  free-zone-subtitle: "&2- Free Zone -"
 
 title:
   fade-in: 5
@@ -52,10 +53,10 @@ messages:
   trust-removed: "&e%player% darf diesen Chunk nicht mehr nutzen."
   trust-exists: "&e%player% &7ist bereits vertraut."
   trust-missing: "&e%player% &7ist diesem Claim nicht vertraut."
-  settings-usage: "&7Verwendung: &f/claim settings <title|subtitle> <Text|reset>"
-  setting-too-long: "&cTitel und Untertitel dürfen höchstens 80 Zeichen lang sein."
-  setting-saved: "&aTitel/Untertitel gespeichert. Änderungen sind kostenlos."
+  settings-usage: "&7Verwendung: &f/claim settings title <Text|reset>"
+  setting-too-long: "&cDer Titel darf höchstens 80 Zeichen lang sein."
+  setting-saved: "&aDer Titel wurde gespeichert."
   info: "&aClaim von &e%owner%&a. Vertraut: &f%trusted%"
   admin-usage: "&7Verwendung: &f/claim admin unclaim"
   admin-unclaimed: "&aClaim administrativ entfernt."
-  help: "&a/claim &7Chunk sichern | &a/claim unclaim &7freigeben | &a/claim trust add <Spieler> &7vertrauen | &a/claim trust remove <Spieler> &7entfernen | &a/claim trust list | &a/claim settings <title|subtitle> <Text|reset> &7Anzeige ändern | &a/claim info"
+  help: "&a/claim &7Chunk sichern | &a/claim unclaim &7freigeben | &a/claim trust add <Spieler> &7vertrauen | &a/claim trust remove <Spieler> &7entfernen | &a/claim trust list | &a/claim settings title <Text|reset> &7Titel setzen | &a/claim info"

@@ -65,7 +65,6 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
       this.loadClaims();
       this.rebuildConnectedClaimCounts();
       plugin.getServer().getPluginManager().registerEvents(this, plugin);
-      Bukkit.getScheduler().runTaskTimer(plugin, this::updateClaimActionBars, 1L, 20L);
    }
 
    @Override
@@ -249,8 +248,8 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
    }
 
    private void handleSettings(Player player, String[] args) {
-      if (args.length < 3 || !(args[1].equalsIgnoreCase("title") || args[1].equalsIgnoreCase("subtitle"))) {
-         this.sendPath(player, "messages.settings-usage", "&7Verwendung: &f/claim settings <title|subtitle> <Text|reset>");
+      if (args.length < 3 || !args[1].equalsIgnoreCase("title")) {
+         this.sendPath(player, "messages.settings-usage", "&7Verwendung: &f/claim settings title <Text|reset>");
          return;
       }
       ChunkKey key = key(player.getLocation().getChunk());
@@ -259,33 +258,23 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
          this.sendPath(player, "messages.not-claimed", "&cDieser Chunk ist nicht gesichert.");
          return;
       }
-      boolean title = args[1].equalsIgnoreCase("title");
-      String setting = title ? "title" : "subtitle";
-      if (!this.canRunClaimAction(player, claim, "claim.settings." + setting, "claim.admin.settings." + setting)) {
+      if (!this.canRunClaimAction(player, claim, "claim.settings.title", "claim.admin.settings.title")) {
          return;
       }
       String text = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length)).trim();
       if (text.length() > 80) {
-         this.sendPath(player, "messages.setting-too-long", "&cTitel und Untertitel dürfen höchstens 80 Zeichen lang sein.");
+         this.sendPath(player, "messages.setting-too-long", "&cDer Titel darf höchstens 80 Zeichen lang sein.");
          return;
       }
-      String previous = title ? claim.title : claim.subtitle;
+      String previous = claim.title;
       String value = text.equalsIgnoreCase("reset") ? "" : text;
-      if (title) {
-         claim.title = value;
-      } else {
-         claim.subtitle = value;
-      }
+      claim.title = value;
       if (!this.saveClaims()) {
-         if (title) {
-            claim.title = previous;
-         } else {
-            claim.subtitle = previous;
-         }
+         claim.title = previous;
          this.sendPath(player, "messages.save-failed", "&cDer Claim konnte nicht gespeichert werden.");
          return;
       }
-      this.sendPath(player, "messages.setting-saved", "&aTitel/Untertitel gespeichert. Änderungen sind kostenlos.");
+      this.sendPath(player, "messages.setting-saved", "&aDer Titel wurde gespeichert.");
    }
 
    private void handleAdmin(Player player, String[] args) {
@@ -322,7 +311,7 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
    }
 
    private void showHelp(Player player) {
-      this.sendPath(player, "messages.help", "&a/claim &7Chunk kostenlos sichern | &a/claim unclaim &7freigeben | &a/claim trust add <Spieler> &7vertrauen | &a/claim trust remove <Spieler> &7entfernen | &a/claim settings <title|subtitle> <Text|reset> &7Anzeige setzen | &a/claim info");
+      this.sendPath(player, "messages.help", "&a/claim &7Chunk sichern | &a/claim unclaim &7freigeben | &a/claim trust add <Spieler> &7vertrauen | &a/claim trust remove <Spieler> &7entfernen | &a/claim trust list | &a/claim settings title <Text|reset> &7Titel setzen | &a/claim info");
    }
 
    @Override
@@ -334,7 +323,7 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
          List<String> choices = new ArrayList<>(List.of("claim"));
          if (this.hasPermission(sender, "claim.unclaim") || this.hasPermission(sender, "claim.admin.unclaim", LEGACY_ADMIN_PERMISSION)) choices.add("unclaim");
          if (this.hasPermission(sender, "claim.trust.add") || this.hasPermission(sender, "claim.trust.remove") || this.hasPermission(sender, "claim.trust.list") || this.hasPermission(sender, "claim.admin.trust", LEGACY_ADMIN_PERMISSION)) choices.add("trust");
-         if (this.hasPermission(sender, "claim.settings.title") || this.hasPermission(sender, "claim.settings.subtitle") || this.hasPermission(sender, "claim.admin.settings.title", LEGACY_ADMIN_PERMISSION) || this.hasPermission(sender, "claim.admin.settings.subtitle", LEGACY_ADMIN_PERMISSION)) choices.add("settings");
+         if (this.hasPermission(sender, "claim.settings.title") || this.hasPermission(sender, "claim.admin.settings.title", LEGACY_ADMIN_PERMISSION)) choices.add("settings");
          if (this.hasPermission(sender, "claim.info")) choices.add("info");
          if (this.hasPermission(sender, "claim.help")) choices.add("help");
          if (this.hasPermission(sender, "claim.admin.unclaim", LEGACY_ADMIN_PERMISSION)) {
@@ -356,10 +345,9 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
       if (args.length == 2 && args[0].equalsIgnoreCase("settings")) {
          List<String> choices = new ArrayList<>();
          if (this.hasPermission(sender, "claim.settings.title") || this.hasPermission(sender, "claim.admin.settings.title", LEGACY_ADMIN_PERMISSION)) choices.add("title");
-         if (this.hasPermission(sender, "claim.settings.subtitle") || this.hasPermission(sender, "claim.admin.settings.subtitle", LEGACY_ADMIN_PERMISSION)) choices.add("subtitle");
          return prefixMatches(choices, args[1]);
       }
-      if (args.length == 3 && args[0].equalsIgnoreCase("settings") && ((args[1].equalsIgnoreCase("title") && (this.hasPermission(sender, "claim.settings.title") || this.hasPermission(sender, "claim.admin.settings.title", LEGACY_ADMIN_PERMISSION))) || (args[1].equalsIgnoreCase("subtitle") && (this.hasPermission(sender, "claim.settings.subtitle") || this.hasPermission(sender, "claim.admin.settings.subtitle", LEGACY_ADMIN_PERMISSION))))) {
+      if (args.length == 3 && args[0].equalsIgnoreCase("settings") && args[1].equalsIgnoreCase("title") && (this.hasPermission(sender, "claim.settings.title") || this.hasPermission(sender, "claim.admin.settings.title", LEGACY_ADMIN_PERMISSION))) {
          return prefixMatches(List.of("reset"), args[2]);
       }
       if (args.length == 2 && args[0].equalsIgnoreCase("admin") && this.hasPermission(sender, "claim.admin.unclaim", LEGACY_ADMIN_PERMISSION)) {
@@ -466,7 +454,7 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
       if (!this.isEnabled() || event.getTo() == null || sameChunk(event.getFrom(), event.getTo())) {
          return;
       }
-      this.updateClaimTitle(event.getPlayer(), event.getTo());
+      this.updateClaimEntry(event.getPlayer(), event.getTo());
    }
 
    @EventHandler
@@ -474,14 +462,14 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
       Bukkit.getScheduler().runTask(this.plugin, () -> {
          Player player = event.getPlayer();
          if (player.isOnline()) {
-            this.updateClaimTitle(player, player.getLocation());
+            this.updateClaimEntry(player, player.getLocation());
          }
       });
    }
 
    @EventHandler
    public void onWorldChange(PlayerChangedWorldEvent event) {
-      this.updateClaimTitle(event.getPlayer(), event.getPlayer().getLocation());
+      this.updateClaimEntry(event.getPlayer(), event.getPlayer().getLocation());
    }
 
    @EventHandler
@@ -509,7 +497,10 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
          || this.hasPermission(player, "claim.admin.bypass", LEGACY_ADMIN_PERMISSION);
    }
 
-   private void updateClaimTitle(Player player, Location location) {
+   private void updateClaimEntry(Player player, Location location) {
+      if (!this.isEnabled()) {
+         return;
+      }
       ChunkKey currentKey = key(location);
       ChunkKey previousKey = this.lastPlayerChunks.put(player.getUniqueId(), currentKey);
       if (currentKey.equals(previousKey)) {
@@ -517,14 +508,20 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
       }
       Claim claim = this.claims.get(currentKey);
       if (claim == null) {
+         if (previousKey != null && this.claims.containsKey(previousKey)) {
+            String freeZoneSubtitle = this.config.getString("defaults.free-zone-subtitle", "&2- Free Zone -");
+            player.sendTitle("", color(freeZoneSubtitle), Math.max(0, this.config.getInt("title.fade-in", 5)),
+               Math.max(0, this.config.getInt("title.stay", 45)), Math.max(0, this.config.getInt("title.fade-out", 10)));
+         }
          return;
       }
       String title = claim.title.isBlank() ? this.config.getString("defaults.title", "&2Claim von %owner%") : claim.title;
-      String subtitle = claim.subtitle.isBlank() ? this.config.getString("defaults.subtitle", "&7Claim geschützt") : claim.subtitle;
+      String subtitle = this.config.getString("defaults.subtitle", "&7Claim geschützt");
       title = title.replace("%owner%", claim.ownerName);
-      subtitle = subtitle.replace("%owner%", claim.ownerName).replace("%title%", claim.title).replace("%subtitle%", claim.subtitle);
+      subtitle = subtitle.replace("%owner%", claim.ownerName).replace("%title%", claim.title);
       player.sendTitle(color(title), color(subtitle), Math.max(0, this.config.getInt("title.fade-in", 5)),
          Math.max(0, this.config.getInt("title.stay", 45)), Math.max(0, this.config.getInt("title.fade-out", 10)));
+      this.sendClaimActionBar(player, currentKey, claim);
    }
 
    private int countClaims(UUID owner) {
@@ -537,29 +534,23 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
       return count;
    }
 
-   private void updateClaimActionBars() {
-      if (!this.isEnabled() || !this.config.getBoolean("actionbar.enabled", true)) {
+   private void sendClaimActionBar(Player player, ChunkKey key, Claim claim) {
+      if (!this.config.getBoolean("actionbar.enabled", true)) {
          return;
       }
-      for (Player player : Bukkit.getOnlinePlayers()) {
-         Claim claim = this.claims.get(key(player.getLocation()));
-         if (claim == null) {
-            continue;
-         }
-         int regionSize = this.connectedClaimCounts.getOrDefault(key(player.getLocation()), 1);
-         String extra = regionSize > 1
-            ? this.config.getString("actionbar.multiple-claims-format", " &8(&f%count%&7 verbundene Claims&8)").replace("%count%", Integer.toString(regionSize))
-            : "";
-         String prefix = this.plugin.getConfig().getString("messages.prefix", DEFAULT_PREFIX);
-         String format = this.config.getString("actionbar.format", "%(plugin)prefix% | Chunk -> %spieler%%claims%");
-         String message = format.replace("%(plugin)prefix%", prefix)
-            .replace("%spieler%", claim.ownerName)
-            .replace("%owner%", claim.ownerName)
-            .replace("%count%", Integer.toString(regionSize))
-            .replace("%claims%", extra);
-         message = this.plugin.applyPlaceholders(player, message);
-         player.sendActionBar(LEGACY.deserialize(color(message)));
-      }
+      int regionSize = this.connectedClaimCounts.getOrDefault(key, 1);
+      String extra = regionSize > 1
+         ? this.config.getString("actionbar.multiple-claims-format", " &8(&f%count%&7 verbundene Claims&8)").replace("%count%", Integer.toString(regionSize))
+         : "";
+      String prefix = this.plugin.getConfig().getString("messages.prefix", DEFAULT_PREFIX);
+      String format = this.config.getString("actionbar.format", "%(plugin)prefix% | Chunk -> %spieler%%claims%");
+      String message = format.replace("%(plugin)prefix%", prefix)
+         .replace("%spieler%", claim.ownerName)
+         .replace("%owner%", claim.ownerName)
+         .replace("%count%", Integer.toString(regionSize))
+         .replace("%claims%", extra);
+      message = this.plugin.applyPlaceholders(player, message);
+      player.sendActionBar(LEGACY.deserialize(color(message)));
    }
 
    private int claimLimit(Player player) {
@@ -715,7 +706,6 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
                UUID owner = UUID.fromString(section.getString("owner", ""));
                Claim claim = new Claim(owner, section.getString("owner-name", "Spieler"));
                claim.title = section.getString("title", "");
-               claim.subtitle = section.getString("subtitle", "");
                ConfigurationSection trusted = section.getConfigurationSection("trusted");
                if (trusted != null) {
                   for (String id : trusted.getKeys(false)) {
@@ -743,7 +733,6 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
          data.set(path + ".owner", claim.owner.toString());
          data.set(path + ".owner-name", claim.ownerName);
          data.set(path + ".title", claim.title);
-         data.set(path + ".subtitle", claim.subtitle);
          for (Map.Entry<UUID, String> trusted : claim.trusted.entrySet()) {
             data.set(path + ".trusted." + trusted.getKey(), trusted.getValue());
          }
@@ -783,8 +772,6 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
       private final String ownerName;
       private final Map<UUID, String> trusted = new HashMap<>();
       private String title = "";
-      private String subtitle = "";
-
       private Claim(UUID owner, String ownerName) {
          this.owner = owner;
          this.ownerName = ownerName;
