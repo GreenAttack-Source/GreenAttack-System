@@ -8,6 +8,7 @@ import de.greenattack.system.features.AntiCheatFeature;
 import de.greenattack.system.features.AdminFeature;
 import de.greenattack.system.features.BoosterFeature;
 import de.greenattack.system.features.ClanFeature;
+import de.greenattack.system.features.ClaimFeature;
 import de.greenattack.system.features.CodeFeature;
 import de.greenattack.system.features.ECFeature;
 import de.greenattack.system.features.EconomyFeature;
@@ -72,7 +73,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class GreenAttackSystemPlugin extends JavaPlugin implements Listener {
    private static final int FEATURE_FOLDER_LAYOUT_VERSION = 1;
    private static final Set<String> CURRENT_FEATURE_FOLDERS = Set.of(
-      "admin", "aktionshaus", "anticheat", "booster", "clans", "codes", "create-cmds", "db", "economy", "enderchest",
+      "admin", "aktionshaus", "anticheat", "booster", "claims", "clans", "codes", "create-cmds", "db", "economy", "enderchest",
       "fly", "gamemode", "halloween", "home", "inventory", "invsee-bridge", "isign", "kit", "kristall", "market",
       "monitoring", "msg", "mysqlplayerbridge", "news", "one-klick", "playtime", "rank", "rtp", "sell", "spawn", "teleportsystem"
    );
@@ -94,6 +95,7 @@ public final class GreenAttackSystemPlugin extends JavaPlugin implements Listene
    private MsgFeature msgFeature;
    private ECFeature ecFeature;
    private InventoryFeature inventoryFeature;
+   private ClaimFeature claimFeature;
    private SpawnFeature spawnFeature;
    private RtpFeature rtpFeature;
    private MarketFeature marketFeature;
@@ -249,6 +251,11 @@ public final class GreenAttackSystemPlugin extends JavaPlugin implements Listene
          this.getLogger().log(java.util.logging.Level.WARNING, "Feature \"InventoryFeature\" konnte nicht gestartet werden und wird uebersprungen (fehlende Abhaengigkeit oder nicht unterstuetzte Server-/Paper-Version).\nAlle anderen Features laufen trotzdem weiter. Fehler:", throwable);
       }
       try {
+         this.claimFeature = new ClaimFeature(this);
+      } catch (Throwable throwable) {
+         this.getLogger().log(java.util.logging.Level.WARNING, "Feature \"ClaimFeature\" konnte nicht gestartet werden und wird uebersprungen (fehlende Abhaengigkeit oder nicht unterstuetzte Server-/Paper-Version).\nAlle anderen Features laufen trotzdem weiter. Fehler:", throwable);
+      }
+      try {
          this.spawnFeature = new SpawnFeature(this);
       } catch (Throwable throwable) {
          this.getLogger().log(java.util.logging.Level.WARNING, "Feature \"SpawnFeature\" konnte nicht gestartet werden und wird uebersprungen (fehlende Abhaengigkeit oder nicht unterstuetzte Server-/Paper-Version).\nAlle anderen Features laufen trotzdem weiter. Fehler:", throwable);
@@ -336,6 +343,7 @@ public final class GreenAttackSystemPlugin extends JavaPlugin implements Listene
       this.registerFeatureCommand("msglogs", this.msgFeature, null);
       this.claimMsgCommandLabels();
       this.registerFeatureCommand("ec", this.ecFeature, this.ecFeature);
+      this.registerFeatureCommand("claim", this.claimFeature, this.claimFeature);
 
       for (String commandName : List.of("invsee", "ecsee")) {
          this.registerFeatureCommand(commandName, this.inventoryFeature, this.inventoryFeature);
@@ -1034,6 +1042,10 @@ public final class GreenAttackSystemPlugin extends JavaPlugin implements Listene
 
       if (this.inventoryFeature != null) {
          this.inventoryFeature.reloadFeature();
+      }
+
+      if (this.claimFeature != null) {
+         this.claimFeature.reload();
       }
 
       if (this.spawnFeature != null) {

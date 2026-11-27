@@ -66,8 +66,12 @@ public final class SellFeature extends FeatureModule implements CommandExecutor,
          if (resource != null) {
             YamlConfiguration defaults = YamlConfiguration.loadConfiguration(new InputStreamReader(resource, StandardCharsets.UTF_8));
             ConfigurationSection defaultPrices = defaults.getConfigurationSection("prices");
+            boolean changed = false;
+            if (!this.config.contains("price-multiplier")) {
+               this.config.set("price-multiplier", defaults.getDouble("price-multiplier", 1.5));
+               changed = true;
+            }
             if (defaultPrices != null) {
-               boolean changed = false;
 
                for (String material : defaultPrices.getKeys(false)) {
                   String path = "prices." + material;
@@ -77,9 +81,9 @@ public final class SellFeature extends FeatureModule implements CommandExecutor,
                   }
                }
 
-               if (changed && !this.save()) {
-                  this.plugin.getLogger().warning("Neue Citybuild-Standardpreise konnten nicht in features/sell/config.yml übernommen werden.");
-               }
+            }
+            if (changed && !this.save()) {
+               this.plugin.getLogger().warning("Neue Citybuild-Standardpreise konnten nicht in features/sell/config.yml übernommen werden.");
             }
          }
       } catch (IOException exception) {
@@ -378,6 +382,8 @@ public final class SellFeature extends FeatureModule implements CommandExecutor,
          itemValue = itemValue.multiply(BigDecimal.valueOf(remainingDurability)).divide(BigDecimal.valueOf(maximumDamage), 8, RoundingMode.HALF_UP);
       }
 
+      BigDecimal multiplier = this.safePrice(this.config.getDouble("price-multiplier", 1.5));
+      itemValue = itemValue.multiply(multiplier);
       return itemValue.signum() > 0 ? itemValue : BigDecimal.ZERO;
    }
 

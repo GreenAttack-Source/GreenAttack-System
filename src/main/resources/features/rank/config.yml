@@ -10,8 +10,11 @@ menu:
   balance-name: "&aDeine Kristalle"
   purchase-hint: "&eKlicke zum Kaufen"
 
+# Rangschlüssel, Anzeigenamen und LuckPerms-Gruppen sind frei konfigurierbar.
+# Füge beliebig viele Einträge hinzu. Das Menü zeigt bis zu neun Einträge je Seite mittig an.
+# Die Reihenfolge in dieser Liste ist die Kaufreihenfolge; Preise müssen aufsteigen.
 # LuckPerms-Gruppennamen müssen bereits existieren.
-# Beim Rangwechsel entfernt GreenAttack nur diese drei Rang-Eltern-Gruppen.
+# Beim Rangwechsel entfernt GreenAttack nur die hier konfigurierten Rang-Eltern-Gruppen.
 # Alle anderen LuckPerms-Gruppen und Eltern-Gruppen bleiben unverändert.
 ranks:
   natur:

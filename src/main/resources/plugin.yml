@@ -105,6 +105,10 @@ commands:
   ec:
     description: Öffnet deine eigene Endertruhe.
     usage: /ec
+  claim:
+    description: Sichert deinen aktuellen Chunk und verwaltet vertraute Spieler.
+    aliases: [claims, land]
+    usage: /claim [trust|settings|unclaim|info|help]
   spawn:
     description: Teleportiert dich oder einen Spieler zum Spawn.
     usage: /spawn [Spieler]
@@ -150,7 +154,7 @@ commands:
     permission: system.sell
     permission-message: "Dafür hast du keine Berechtigung."
   rank:
-    description: Öffnet den Rangmarkt für Natur, Premium und Titan.
+    description: Öffnet den konfigurierbaren Rangmarkt.
     aliases: [ränge]
     usage: /rank [reload]
     permission: system.rank.use
@@ -399,6 +403,15 @@ permissions:
   system.ec:
     description: Allows opening your own ender chest with /ec.
     default: false
+  system.claim.use:
+    description: Allows claiming chunks and managing claim settings.
+    default: true
+  system.claim.unlimited:
+    description: Removes the configured limit on the number of personal claims.
+    default: false
+  system.claim.admin:
+    description: Allows bypassing claim protection and administratively removing claims.
+    default: op
   system.spawn:
     description: Allows teleporting yourself to your group spawn with /spawn.
     default: true

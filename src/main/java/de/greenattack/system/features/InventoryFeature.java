@@ -218,7 +218,7 @@ public final class InventoryFeature extends FeatureModule implements CommandExec
          menu.setItem(46, this.cloneItem(armor[2]));
          menu.setItem(47, this.cloneItem(armor[1]));
          menu.setItem(48, this.cloneItem(armor[0]));
-         menu.setItem(49, this.cloneItem(playerInventory.getItemInMainHand()));
+         menu.setItem(49, null);
          menu.setItem(50, this.cloneItem(playerInventory.getItemInOffHand()));
          menu.setItem(51, filler.clone());
          menu.setItem(52, filler.clone());

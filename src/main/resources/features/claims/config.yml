@@ -1,0 +1,46 @@
+enabled: true
+
+permissions:
+  use: "system.claim.use"
+
+# Chunk claims haben keinen Kaufpreis. Der Standard erlaubt zehn Claims pro Spieler.
+max-claims-per-player: 10
+disabled-worlds: []
+
+# Diese Standardtexte erscheinen beim Betreten eines Claims, sofern dort kein eigener Text gesetzt ist.
+defaults:
+  title: "&2Claim von %owner%"
+  subtitle: "&7Dieser Chunk ist geschützt."
+
+title:
+  fade-in: 5
+  stay: 45
+  fade-out: 10
+
+messages:
+  disabled: "&cDas Claim-Feature ist deaktiviert."
+  no-permission: "&cDafür hast du keine Berechtigung."
+  player-only: "&cDiesen Befehl können nur Spieler verwenden."
+  world-disabled: "&cClaims sind in dieser Welt deaktiviert."
+  claimed: "&aChunk gesichert. Claims sind kostenlos. &7(&f%count%&7/&f%limit%&7)"
+  already-claimed: "&cDieser Chunk gehört bereits &e%owner%&c."
+  claim-limit: "&cDu hast dein Limit von &e%limit% &cChunks erreicht."
+  not-claimed: "&cDieser Chunk ist nicht gesichert."
+  not-owner: "&cNur &e%owner% &ckann diesen Claim verwalten."
+  unclaimed: "&aDer Chunk ist jetzt wieder frei."
+  save-failed: "&cDer Claim konnte nicht gespeichert werden."
+  protected: "&cDieses Grundstück gehört &e%owner%&c."
+  player-not-found: "&cDer Spieler muss online sein."
+  trust-usage: "&7Verwendung: &f/claim trust <add|remove|list> [Spieler]"
+  trust-owner: "&cDer Besitzer braucht keinen Trust-Eintrag."
+  trust-added: "&a%player% darf diesen Chunk jetzt nutzen. (kostenlos)"
+  trust-removed: "&e%player% darf diesen Chunk nicht mehr nutzen."
+  trust-exists: "&e%player% &7ist bereits vertraut."
+  trust-missing: "&e%player% &7ist diesem Claim nicht vertraut."
+  settings-usage: "&7Verwendung: &f/claim settings <title|subtitle> <Text|reset>"
+  setting-too-long: "&cTitel und Untertitel dürfen höchstens 80 Zeichen lang sein."
+  setting-saved: "&aTitel/Untertitel gespeichert. Änderungen sind kostenlos."
+  info: "&aClaim von &e%owner%&a. Vertraut: &f%trusted%"
+  admin-usage: "&7Verwendung: &f/claim admin unclaim"
+  admin-unclaimed: "&aClaim administrativ entfernt."
+  help: "&a/claim &7Chunk kostenlos sichern | &a/claim unclaim &7freigeben | &a/claim trust add <Spieler> &7vertrauen | &a/claim trust remove <Spieler> &7entfernen | &a/claim trust list | &a/claim settings <title|subtitle> <Text|reset> &7Anzeige ändern | &a/claim info"

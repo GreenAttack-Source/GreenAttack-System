@@ -6,8 +6,10 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -20,6 +22,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,7 +36,8 @@ import org.bukkit.plugin.Plugin;
 
 public final class RankFeature extends FeatureModule implements CommandExecutor, TabCompleter, Listener {
    private static final int MENU_SIZE = 27;
-   private static final int[] RANK_SLOTS = new int[]{11, 13, 15};
+   private static final int RANK_ROW_START = 9;
+   private static final int RANK_ROW_LENGTH = 9;
    private final KristallFeature kristallFeature;
    private final Set<UUID> pendingPurchases = new HashSet<>();
 
@@ -88,35 +92,57 @@ public final class RankFeature extends FeatureModule implements CommandExecutor,
    }
 
    private void openMenu(Player player) {
+      this.openMenu(player, 0);
+   }
+
+   private void openMenu(Player player, int requestedPage) {
       RankFeature.RankMenuHolder holder = new RankFeature.RankMenuHolder();
       String title = color(this.config.getString("menu.title", "&8Rangmarkt"));
       Inventory inventory = Bukkit.createInventory(holder, 27, title);
       holder.inventory = inventory;
+      List<RankFeature.RankOffer> offers = this.loadOffers();
+      int pageCount = Math.max(1, (offers.size() + RANK_ROW_LENGTH - 1) / RANK_ROW_LENGTH);
+      holder.page = Math.max(0, Math.min(requestedPage, pageCount - 1));
       ItemStack filler = this.createItem(this.config.getString("menu.filler-material", "GRAY_STAINED_GLASS_PANE"), "&7 ", List.of());
 
       for (int slot = 0; slot < 27; slot++) {
          inventory.setItem(slot, filler.clone());
       }
 
+      List<String> balanceLore = new ArrayList<>();
+      balanceLore.add("&7Kontostand: &b" + compactAmount(this.kristallFeature.getBalance(player.getUniqueId())) + " Kristalle");
+      if (pageCount > 1) {
+         balanceLore.add("&7Seite &f" + (holder.page + 1) + "&7/&f" + pageCount);
+      }
       inventory.setItem(
          4,
          this.createItem(
             "EMERALD",
             this.config.getString("menu.balance-name", "&aDeine Kristalle"),
-            List.of("&7Kontostand: &b" + compactAmount(this.kristallFeature.getBalance(player.getUniqueId())) + " Kristalle")
+            balanceLore
          )
       );
-      List<RankFeature.RankOffer> offers = this.loadOffers();
 
-      for (int index = 0; index < offers.size(); index++) {
-         RankFeature.RankOffer offer = offers.get(index);
+      int pageFirstOffer = holder.page * RANK_ROW_LENGTH;
+      List<RankFeature.RankOffer> pageOffers = offers.subList(pageFirstOffer, Math.min(pageFirstOffer + RANK_ROW_LENGTH, offers.size()));
+      int firstSlot = RANK_ROW_START + Math.max(0, (RANK_ROW_LENGTH - pageOffers.size()) / 2);
+      for (int index = 0; index < pageOffers.size(); index++) {
+         RankFeature.RankOffer offer = pageOffers.get(index);
          List<String> lore = new ArrayList<>();
          lore.add("&7Preis: &b" + compactAmount(offer.price()) + " Kristalle");
          lore.add(" ");
          lore.add(this.config.getString("menu.purchase-hint", "&eKlicke zum Kaufen"));
-         inventory.setItem(RANK_SLOTS[index], this.createItem(offer.material(), offer.displayName(), lore));
+         int slot = firstSlot + index;
+         holder.offersBySlot.put(slot, offer);
+         inventory.setItem(slot, this.createItem(offer.material(), offer.displayName(), lore));
       }
 
+      if (holder.page > 0) {
+         inventory.setItem(18, this.createItem("ARROW", "&eVorherige Seite", List.of("&7Klicke für die vorherigen Ränge.")));
+      }
+      if (holder.page + 1 < pageCount) {
+         inventory.setItem(26, this.createItem("ARROW", "&eNächste Seite", List.of("&7Klicke für weitere Ränge.")));
+      }
       inventory.setItem(22, this.createItem("BARRIER", "&cSchließen", List.of("&7Klicke, um das Menü zu schließen.")));
       player.openInventory(inventory);
    }
@@ -131,15 +157,22 @@ public final class RankFeature extends FeatureModule implements CommandExecutor,
             int slot = event.getRawSlot();
             if (slot == 22) {
                player.closeInventory();
+            } else if (slot == 18 && ((RankFeature.RankMenuHolder)event.getView().getTopInventory().getHolder()).page > 0) {
+               this.openMenu(player, ((RankFeature.RankMenuHolder)event.getView().getTopInventory().getHolder()).page - 1);
+            } else if (slot == 26) {
+               RankFeature.RankMenuHolder holder = (RankFeature.RankMenuHolder)event.getView().getTopInventory().getHolder();
+               List<RankFeature.RankOffer> offers = this.loadOffers();
+               if ((holder.page + 1) * RANK_ROW_LENGTH < offers.size()) {
+                  this.openMenu(player, holder.page + 1);
+               }
             } else {
-               for (int index = 0; index < RANK_SLOTS.length; index++) {
-                  if (slot == RANK_SLOTS[index]) {
-                     List<RankFeature.RankOffer> offers = this.loadOffers();
-                     if (index < offers.size()) {
-                        this.purchase(player, offers.get(index), offers);
-                     }
-
-                     return;
+               RankFeature.RankMenuHolder holder = (RankFeature.RankMenuHolder)event.getView().getTopInventory().getHolder();
+               RankFeature.RankOffer offer = holder.offersBySlot.get(slot);
+               if (offer != null) {
+                  List<RankFeature.RankOffer> offers = this.loadOffers();
+                  RankFeature.RankOffer currentOffer = offers.stream().filter(current -> current.key().equals(offer.key())).findFirst().orElse(null);
+                  if (currentOffer != null) {
+                     this.purchase(player, currentOffer, offers);
                   }
                }
             }
@@ -383,8 +416,15 @@ public final class RankFeature extends FeatureModule implements CommandExecutor,
    private List<RankFeature.RankOffer> loadOffers() {
       List<RankFeature.RankOffer> offers = new ArrayList<>();
       long previousPrice = 0L;
+      ConfigurationSection ranks = this.config.getConfigurationSection("ranks");
+      if (ranks == null) {
+         this.plugin.getLogger().warning("Keine Rangangebote in features/rank/config.yml konfiguriert.");
+         return List.of();
+      }
 
-      for (String key : List.of("natur", "premium", "titan")) {
+      List<String> rankKeys = new ArrayList<>(ranks.getKeys(false));
+      Set<String> configuredGroups = new HashSet<>();
+      for (String key : rankKeys) {
          String path = "ranks." + key + ".";
          String group = this.config.getString(path + "group", key);
          String display = this.config.getString(path + "name", "&f" + key);
@@ -398,10 +438,11 @@ public final class RankFeature extends FeatureModule implements CommandExecutor,
             price = -1L;
          }
 
-         if (group == null || !group.matches("[A-Za-z0-9_-]+") || material == null || price <= previousPrice) {
+         if (key == null || !key.matches("[A-Za-z0-9_-]+") || group == null || !group.matches("[A-Za-z0-9_-]+")
+            || !configuredGroups.add(group.toLowerCase(Locale.ROOT)) || material == null || price <= previousPrice) {
             this.plugin
                .getLogger()
-               .warning("Ungültiges Rangangebot in features/rank/config.yml: " + key + ". Gruppenname, Item und steigender Kristallpreis müssen gültig sein.");
+               .warning("Ungültiges Rangangebot in features/rank/config.yml: " + key + ". Schlüssel, eindeutige LuckPerms-Gruppe, Item und steigender Kristallpreis müssen gültig sein.");
             return List.of();
          }
 
@@ -525,6 +566,8 @@ public final class RankFeature extends FeatureModule implements CommandExecutor,
 
    private static final class RankMenuHolder implements InventoryHolder {
       private Inventory inventory;
+      private final Map<Integer, RankOffer> offersBySlot = new HashMap<>();
+      private int page;
 
       public Inventory getInventory() {
          return this.inventory;

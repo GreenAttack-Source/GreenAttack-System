@@ -4,6 +4,9 @@ enabled: true
 # Die Werte sind Startpreise und können servergerecht angepasst werden.
 default-price: 0.05
 
+# Erhöht alle Verkaufspreise standardmäßig um 50 Prozent. Kann bei Bedarf angepasst werden.
+price-multiplier: 1.5
+
 prices:
   COAL: 0.25
   CHARCOAL: 0.2
