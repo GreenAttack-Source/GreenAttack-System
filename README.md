@@ -51,7 +51,7 @@ Die Befehle `/greenattack reload` und `/slots <Anzahl>` sind mit `system.admin` 
 
 ## Claims anpassen
 
-Alle Claim-Einstellungen liegen in `plugins/GreenAttack-System/features/claims/config.yml`, wo `max-claims-per-player` als Standardlimit greift, solange ein Spieler kein Zahlenrecht `claim.claims.N` besitzt, der Abschnitt `cost.claim` den Preis pro Chunk festlegt, `disabled-worlds` Welten von der Claim-Erstellung ausschließt und `defaults.title`, `defaults.subtitle` sowie `defaults.free-zone-subtitle` die einmaligen Anzeigen beim Betreten beziehungsweise Verlassen eines Claims definieren.
+Alle Claim-Einstellungen liegen in `plugins/GreenAttack-System/features/claims/config.yml`, wo `max-claims-per-player` als Standardlimit greift, solange ein Spieler kein Zahlenrecht `claim.claims.N` besitzt, der Abschnitt `cost.claim` den Preis pro Chunk festlegt, `disabled-worlds` Welten von der Claim-Erstellung ausschließt, `actionbar.prefix-gradient` den glatten RGB-Verlauf für den Plugin-Prefix definiert und `defaults.title`, `defaults.subtitle` sowie `defaults.free-zone-subtitle` die einmaligen Anzeigen beim Betreten beziehungsweise Verlassen eines Claims festlegen.
 
 Der Preis steht standardmäßig in der Claim-Config auf `free`, kann aber direkt dort durch einen Zahlenbetrag ersetzt werden, sodass bei jedem neuen Claim der konfigurierte Betrag aus der GreenAttack-Economy abgezogen wird und der Claim abgelehnt wird, wenn die Economy nicht verfügbar ist oder das Guthaben nicht reicht.
 

@@ -47,6 +47,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.Component;
 
 /** Free chunk claims and per-claim trust controls for SMP worlds. */
 public final class ClaimFeature extends FeatureModule implements CommandExecutor, TabCompleter, Listener {
@@ -54,6 +56,7 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
    private static final String ADMIN_PERMISSION = "claim.admin";
    private static final String LEGACY_ADMIN_PERMISSION = "system.claim.admin";
    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacyAmpersand();
+   private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
    private final Map<ChunkKey, Claim> claims = new HashMap<>();
    private final Map<ChunkKey, Integer> connectedClaimCounts = new HashMap<>();
    private final Map<UUID, ChunkKey> lastPlayerChunks = new HashMap<>();
@@ -542,15 +545,26 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
       String extra = regionSize > 1
          ? this.config.getString("actionbar.multiple-claims-format", " &8(&f%count%&7 verbundene Claims&8)").replace("%count%", Integer.toString(regionSize))
          : "";
-      String prefix = this.plugin.getConfig().getString("messages.prefix", DEFAULT_PREFIX);
-      String format = this.config.getString("actionbar.format", "%(plugin)prefix% | Chunk -> %spieler%%claims%");
-      String message = format.replace("%(plugin)prefix%", prefix)
-         .replace("%spieler%", claim.ownerName)
+      String pluginPrefix = this.plugin.applyPlaceholders(player, this.plugin.getConfig().getString("messages.prefix", DEFAULT_PREFIX));
+      String prefixText = stripColorCodes(pluginPrefix);
+      String prefixGradient = this.config.getString(
+         "actionbar.prefix-gradient", "<gradient:#41DD63:#29C9D7:#B64BEE>%prefix%</gradient>"
+      ).replace("%prefix%", prefixText);
+      Component prefixComponent = MINI_MESSAGE.deserialize(this.plugin.applyPlaceholders(player, prefixGradient));
+      String format = this.config.getString("actionbar.format", "%prefix% | Chunk -> %spieler%%claims%");
+      String message = format.replace("%spieler%", claim.ownerName)
          .replace("%owner%", claim.ownerName)
          .replace("%count%", Integer.toString(regionSize))
          .replace("%claims%", extra);
-      message = this.plugin.applyPlaceholders(player, message);
-      player.sendActionBar(LEGACY.deserialize(color(message)));
+      String[] parts = message.split("%prefix%", -1);
+      Component actionBar = Component.empty();
+      for (int i = 0; i < parts.length; i++) {
+         actionBar = actionBar.append(LEGACY.deserialize(color(this.plugin.applyPlaceholders(player, parts[i]))));
+         if (i < parts.length - 1) {
+            actionBar = actionBar.append(prefixComponent);
+         }
+      }
+      player.sendActionBar(actionBar);
    }
 
    private int claimLimit(Player player) {
@@ -756,6 +770,14 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
 
    private static ChunkKey key(Location location) {
       return new ChunkKey(location.getWorld().getUID(), location.getBlockX() >> 4, location.getBlockZ() >> 4);
+   }
+
+   private static String stripColorCodes(String value) {
+      return color(value)
+         .replaceAll("(?i)(?:&|§)#[0-9a-f]{6}", "")
+         .replaceAll("(?i)(?:&|§)x(?:&|§)[0-9a-f](?:&|§)[0-9a-f](?:&|§)[0-9a-f](?:&|§)[0-9a-f](?:&|§)[0-9a-f](?:&|§)[0-9a-f]", "")
+         .replaceAll("(?i)§[0-9a-fk-or]", "")
+         .replaceAll("<[^>]*>", "");
    }
 
    private static boolean sameChunk(Location from, Location to) {

@@ -15,8 +15,10 @@ cost:
 
 actionbar:
   enabled: true
-  # %spieler% ist der Claim-Besitzer. %(plugin)prefix% wird durch den Plugin-Prefix ersetzt.
-  format: "%(plugin)prefix% | Chunk -> %spieler%%claims%"
+  # Glatter RGB-Verlauf für den aus messages.prefix übernommenen Plugin-Prefix.
+  prefix-gradient: "<gradient:#41DD63:#24D9C7:#A74BEE>%prefix%</gradient>"
+  # %spieler% ist der Claim-Besitzer. %prefix% wird durch den Plugin-Prefix ersetzt.
+  format: "%prefix% | Chunk -> %spieler%%claims%"
   # Wird nur bei zusammenhängenden Claims desselben Besitzers angezeigt.
   multiple-claims-format: " &8(&f%count%&7 verbundene Claims&8)"
 
