@@ -403,14 +403,85 @@ permissions:
   system.ec:
     description: Allows opening your own ender chest with /ec.
     default: false
-  system.claim.use:
-    description: Allows claiming chunks and managing claim settings.
+  claim.use:
+    description: Allows using the basic chunk-claim command.
     default: true
-  system.claim.unlimited:
+  claim.claims.1:
+    description: Example claim limit node; grant claim.claims.N for any positive numeric limit.
+    default: false
+  claim.claims.unlimited:
     description: Removes the configured limit on the number of personal claims.
     default: false
+  claim.unclaim:
+    description: Allows unclaiming your own chunk.
+    default: true
+  claim.trust.add:
+    description: Allows adding a trusted player to your own claim.
+    default: true
+  claim.trust.remove:
+    description: Allows removing a trusted player from your own claim.
+    default: true
+  claim.trust.list:
+    description: Allows listing trusted players on your own claim.
+    default: true
+  claim.settings.title:
+    description: Allows changing the title of your own claim.
+    default: true
+  claim.settings.subtitle:
+    description: Allows changing the subtitle of your own claim.
+    default: true
+  claim.info:
+    description: Allows viewing information about the current claim.
+    default: true
+  claim.help:
+    description: Allows viewing the claim command help.
+    default: true
+  claim.admin:
+    description: Grants all claim administration permissions.
+    default: op
+    children:
+      claim.use: true
+      claim.claims.unlimited: true
+      claim.unclaim: true
+      claim.trust.add: true
+      claim.trust.remove: true
+      claim.trust.list: true
+      claim.settings.title: true
+      claim.settings.subtitle: true
+      claim.info: true
+      claim.help: true
+      claim.admin.bypass: true
+      claim.admin.unclaim: true
+      claim.admin.trust: true
+      claim.admin.settings.title: true
+      claim.admin.settings.subtitle: true
+      claim.admin.unlimited: true
+  claim.admin.bypass:
+    description: Allows bypassing protection on other players' claims.
+    default: false
+  claim.admin.unclaim:
+    description: Allows administratively removing another player's claim.
+    default: false
+  claim.admin.trust:
+    description: Allows changing or viewing trust entries on another player's claim.
+    default: false
+  claim.admin.settings.title:
+    description: Allows changing the title of another player's claim.
+    default: false
+  claim.admin.settings.subtitle:
+    description: Allows changing the subtitle of another player's claim.
+    default: false
+  claim.admin.unlimited:
+    description: Allows creating an unlimited number of claims.
+    default: false
+  system.claim.use:
+    description: Legacy claim permission; use claim.use instead.
+    default: false
+  system.claim.unlimited:
+    description: Legacy unlimited-claims permission; use claim.claims.unlimited instead.
+    default: false
   system.claim.admin:
-    description: Allows bypassing claim protection and administratively removing claims.
+    description: Legacy claim administration permission; use claim.admin.* instead.
     default: op
   system.spawn:
     description: Allows teleporting yourself to your group spawn with /spawn.

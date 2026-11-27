@@ -1,10 +1,13 @@
 package de.greenattack.system.features;
 
 import de.greenattack.system.GreenAttackSystemPlugin;
+import de.greenattack.system.economy.EconomyService;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -43,12 +46,16 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 /** Free chunk claims and per-claim trust controls for SMP worlds. */
 public final class ClaimFeature extends FeatureModule implements CommandExecutor, TabCompleter, Listener {
-   private static final String USE_PERMISSION = "system.claim.use";
-   private static final String ADMIN_PERMISSION = "system.claim.admin";
+   private static final String USE_PERMISSION = "claim.use";
+   private static final String ADMIN_PERMISSION = "claim.admin";
+   private static final String LEGACY_ADMIN_PERMISSION = "system.claim.admin";
+   private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacyAmpersand();
    private final Map<ChunkKey, Claim> claims = new HashMap<>();
+   private final Map<ChunkKey, Integer> connectedClaimCounts = new HashMap<>();
    private final Map<UUID, ChunkKey> lastPlayerChunks = new HashMap<>();
    private final File claimsFile;
 
@@ -56,7 +63,9 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
       super(plugin, "claims");
       this.claimsFile = this.featureFile("claims.yml");
       this.loadClaims();
+      this.rebuildConnectedClaimCounts();
       plugin.getServer().getPluginManager().registerEvents(this, plugin);
+      Bukkit.getScheduler().runTaskTimer(plugin, this::updateClaimActionBars, 1L, 20L);
    }
 
    @Override
@@ -65,7 +74,7 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
          this.sendPath(sender, "messages.disabled", "&cDas Claim-Feature ist deaktiviert.");
          return true;
       }
-      if (!this.hasFeaturePermission(sender, this.config.getString("permissions.use", USE_PERMISSION))) {
+      if (!this.hasUsePermission(sender)) {
          this.sendPath(sender, "messages.no-permission", "&cDafür hast du keine Berechtigung.");
          return true;
       }
@@ -80,12 +89,18 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
 
       switch (args[0].toLowerCase(Locale.ROOT)) {
          case "unclaim" -> this.unclaimCurrentChunk(player);
-         case "info" -> this.showInfo(player);
+         case "info" -> {
+            if (this.requirePermission(player, "claim.info")) this.showInfo(player);
+         }
          case "trust" -> this.handleTrust(player, args);
          case "settings" -> this.handleSettings(player, args);
          case "admin" -> this.handleAdmin(player, args);
-         case "help" -> this.showHelp(player);
-         default -> this.showHelp(player);
+         case "help" -> {
+            if (this.requirePermission(player, "claim.help")) this.showHelp(player);
+         }
+         default -> {
+            if (this.requirePermission(player, "claim.help")) this.showHelp(player);
+         }
       }
       return true;
    }
@@ -103,24 +118,46 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
             .replace("%owner%", existing.ownerName));
          return;
       }
-      int maxClaims = Math.max(1, this.config.getInt("max-claims-per-player", 10));
-      if (!player.hasPermission("system.claim.unlimited") && !player.hasPermission(ADMIN_PERMISSION)
-         && this.countClaims(player.getUniqueId()) >= maxClaims) {
-         this.send(player, this.config.getString("messages.claim-limit", "&cDu hast dein Limit von &e%limit% &cChunks erreicht.")
-            .replace("%limit%", Integer.toString(maxClaims)));
+      int maxClaims = this.claimLimit(player);
+      boolean unlimited = maxClaims == Integer.MAX_VALUE;
+      if (!unlimited && this.countClaims(player.getUniqueId()) >= maxClaims) {
+         String limitMessage = this.config.getString("messages.claim-limit", "&cDu hast dein Claim-Limit erreicht.");
+         if (limitMessage.contains("%limit%")) {
+            limitMessage = "&cDu hast dein Claim-Limit erreicht.";
+         }
+         this.send(player, limitMessage);
          return;
+      }
+
+      double cost = this.claimCost();
+      EconomyService economy = this.plugin.getEconomyService();
+      if (cost > 0D) {
+         if (economy == null) {
+            this.sendPath(player, "messages.economy-unavailable", "&cDas Wirtschaftssystem ist nicht verfügbar.");
+            return;
+         }
+         if (!economy.has(player, cost) || !economy.withdraw(player, cost)) {
+            this.send(player, this.config.getString("messages.not-enough-money", "&cEin Claim kostet &e%cost%&c.")
+               .replace("%cost%", economy.format(cost)));
+            return;
+         }
       }
 
       Claim claim = new Claim(player.getUniqueId(), player.getName());
       this.claims.put(key, claim);
       if (!this.saveClaims()) {
          this.claims.remove(key);
+         if (cost > 0D && economy != null && !economy.deposit(player, cost)) {
+            this.plugin.getLogger().severe("Rückerstattung von " + economy.format(cost) + " an " + player.getName() + " nach fehlgeschlagenem Claim-Speichern fehlgeschlagen.");
+         }
          this.sendPath(player, "messages.save-failed", "&cDer Claim konnte nicht gespeichert werden.");
          return;
       }
-      this.send(player, this.config.getString("messages.claimed", "&aChunk gesichert. Claims sind kostenlos. &7(&f%count%&7/&f%limit%&7)")
+      this.rebuildConnectedClaimCounts();
+      this.send(player, this.config.getString("messages.claimed", "&aChunk gesichert. &7Claims: &f%count%&7/&f%limit%")
          .replace("%count%", Integer.toString(this.countClaims(player.getUniqueId())))
-         .replace("%limit%", Integer.toString(maxClaims)));
+         .replace("%limit%", unlimited ? "∞" : Integer.toString(maxClaims))
+         .replace("%cost%", cost > 0D && economy != null ? economy.format(cost) : ""));
    }
 
    private void unclaimCurrentChunk(Player player) {
@@ -130,9 +167,12 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
          this.sendPath(player, "messages.not-claimed", "&cDieser Chunk ist nicht gesichert.");
          return;
       }
-      if (!claim.owner.equals(player.getUniqueId()) && !player.hasPermission(ADMIN_PERMISSION)) {
-         this.send(player, this.config.getString("messages.not-owner", "&cNur &e%owner% &ckann diesen Claim verwalten.")
-            .replace("%owner%", claim.ownerName));
+      boolean owner = claim.owner.equals(player.getUniqueId());
+      boolean allowed = owner
+         ? this.hasPermission(player, "claim.unclaim")
+         : this.hasPermission(player, "claim.admin.unclaim", LEGACY_ADMIN_PERMISSION);
+      if (!allowed) {
+         this.sendPath(player, "messages.no-permission", "&cDafür hast du keine Berechtigung.");
          return;
       }
       this.claims.remove(key);
@@ -141,6 +181,7 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
          this.sendPath(player, "messages.save-failed", "&cDer Claim konnte nicht gespeichert werden.");
          return;
       }
+      this.rebuildConnectedClaimCounts();
       this.sendPath(player, "messages.unclaimed", "&aDer Chunk ist jetzt wieder frei.");
    }
 
@@ -155,18 +196,19 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
          this.sendPath(player, "messages.not-claimed", "&cDieser Chunk ist nicht gesichert.");
          return;
       }
-      if (!claim.owner.equals(player.getUniqueId()) && !player.hasPermission(ADMIN_PERMISSION)) {
-         this.send(player, this.config.getString("messages.not-owner", "&cNur &e%owner% &ckann diesen Claim verwalten.")
-            .replace("%owner%", claim.ownerName));
-         return;
-      }
       String action = args[1].toLowerCase(Locale.ROOT);
       if (action.equals("list")) {
+         if (!this.canRunClaimAction(player, claim, "claim.trust.list", "claim.admin.trust")) {
+            return;
+         }
          this.send(player, "&aVertraute Spieler: &f" + (claim.trusted.isEmpty() ? "keine" : String.join(", ", claim.trusted.values())));
          return;
       }
       if (args.length != 3 || !(action.equals("add") || action.equals("remove"))) {
          this.sendPath(player, "messages.trust-usage", "&7Verwendung: &f/claim trust <add|remove|list> [Spieler]");
+         return;
+      }
+      if (!this.canRunClaimAction(player, claim, "claim.trust." + action, "claim.admin.trust")) {
          return;
       }
       Player target = Bukkit.getOnlinePlayers().stream().filter(online -> online.getName().equalsIgnoreCase(args[2])).findFirst().orElse(null);
@@ -217,9 +259,9 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
          this.sendPath(player, "messages.not-claimed", "&cDieser Chunk ist nicht gesichert.");
          return;
       }
-      if (!claim.owner.equals(player.getUniqueId()) && !player.hasPermission(ADMIN_PERMISSION)) {
-         this.send(player, this.config.getString("messages.not-owner", "&cNur &e%owner% &ckann diesen Claim verwalten.")
-            .replace("%owner%", claim.ownerName));
+      boolean title = args[1].equalsIgnoreCase("title");
+      String setting = title ? "title" : "subtitle";
+      if (!this.canRunClaimAction(player, claim, "claim.settings." + setting, "claim.admin.settings." + setting)) {
          return;
       }
       String text = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length)).trim();
@@ -227,7 +269,6 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
          this.sendPath(player, "messages.setting-too-long", "&cTitel und Untertitel dürfen höchstens 80 Zeichen lang sein.");
          return;
       }
-      boolean title = args[1].equalsIgnoreCase("title");
       String previous = title ? claim.title : claim.subtitle;
       String value = text.equalsIgnoreCase("reset") ? "" : text;
       if (title) {
@@ -248,7 +289,7 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
    }
 
    private void handleAdmin(Player player, String[] args) {
-      if (!player.hasPermission(ADMIN_PERMISSION)) {
+      if (!this.hasPermission(player, "claim.admin.unclaim", LEGACY_ADMIN_PERMISSION)) {
          this.sendPath(player, "messages.no-permission", "&cDafür hast du keine Berechtigung.");
          return;
       }
@@ -261,6 +302,7 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
             this.claims.put(key, claim);
             this.sendPath(player, "messages.save-failed", "&cDer Claim konnte nicht gespeichert werden.");
          } else {
+            this.rebuildConnectedClaimCounts();
             this.sendPath(player, "messages.admin-unclaimed", "&aClaim administrativ entfernt.");
          }
       } else {
@@ -285,29 +327,42 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
 
    @Override
    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-      if (!this.isEnabled() || !this.hasFeaturePermission(sender, this.config.getString("permissions.use", USE_PERMISSION))) {
+      if (!this.isEnabled() || !this.hasUsePermission(sender)) {
          return List.of();
       }
       if (args.length == 1) {
-         List<String> choices = new ArrayList<>(List.of("claim", "unclaim", "trust", "settings", "info", "help"));
-         if (sender.hasPermission(ADMIN_PERMISSION)) {
+         List<String> choices = new ArrayList<>(List.of("claim"));
+         if (this.hasPermission(sender, "claim.unclaim") || this.hasPermission(sender, "claim.admin.unclaim", LEGACY_ADMIN_PERMISSION)) choices.add("unclaim");
+         if (this.hasPermission(sender, "claim.trust.add") || this.hasPermission(sender, "claim.trust.remove") || this.hasPermission(sender, "claim.trust.list") || this.hasPermission(sender, "claim.admin.trust", LEGACY_ADMIN_PERMISSION)) choices.add("trust");
+         if (this.hasPermission(sender, "claim.settings.title") || this.hasPermission(sender, "claim.settings.subtitle") || this.hasPermission(sender, "claim.admin.settings.title", LEGACY_ADMIN_PERMISSION) || this.hasPermission(sender, "claim.admin.settings.subtitle", LEGACY_ADMIN_PERMISSION)) choices.add("settings");
+         if (this.hasPermission(sender, "claim.info")) choices.add("info");
+         if (this.hasPermission(sender, "claim.help")) choices.add("help");
+         if (this.hasPermission(sender, "claim.admin.unclaim", LEGACY_ADMIN_PERMISSION)) {
             choices.add("admin");
          }
          return prefixMatches(choices, args[0]);
       }
       if (args.length == 2 && args[0].equalsIgnoreCase("trust")) {
-         return prefixMatches(List.of("add", "remove", "list"), args[1]);
+         List<String> choices = new ArrayList<>();
+         boolean trustAdmin = this.hasPermission(sender, "claim.admin.trust", LEGACY_ADMIN_PERMISSION);
+         if (this.hasPermission(sender, "claim.trust.add") || trustAdmin) choices.add("add");
+         if (this.hasPermission(sender, "claim.trust.remove") || trustAdmin) choices.add("remove");
+         if (this.hasPermission(sender, "claim.trust.list") || trustAdmin) choices.add("list");
+         return prefixMatches(choices, args[1]);
       }
-      if (args.length == 3 && args[0].equalsIgnoreCase("trust") && (args[1].equalsIgnoreCase("add") || args[1].equalsIgnoreCase("remove"))) {
+      if (args.length == 3 && args[0].equalsIgnoreCase("trust") && ((args[1].equalsIgnoreCase("add") && (this.hasPermission(sender, "claim.trust.add") || this.hasPermission(sender, "claim.admin.trust", LEGACY_ADMIN_PERMISSION))) || (args[1].equalsIgnoreCase("remove") && (this.hasPermission(sender, "claim.trust.remove") || this.hasPermission(sender, "claim.admin.trust", LEGACY_ADMIN_PERMISSION))))) {
          return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(name -> name.toLowerCase(Locale.ROOT).startsWith(args[2].toLowerCase(Locale.ROOT))).sorted(String.CASE_INSENSITIVE_ORDER).toList();
       }
       if (args.length == 2 && args[0].equalsIgnoreCase("settings")) {
-         return prefixMatches(List.of("title", "subtitle"), args[1]);
+         List<String> choices = new ArrayList<>();
+         if (this.hasPermission(sender, "claim.settings.title") || this.hasPermission(sender, "claim.admin.settings.title", LEGACY_ADMIN_PERMISSION)) choices.add("title");
+         if (this.hasPermission(sender, "claim.settings.subtitle") || this.hasPermission(sender, "claim.admin.settings.subtitle", LEGACY_ADMIN_PERMISSION)) choices.add("subtitle");
+         return prefixMatches(choices, args[1]);
       }
-      if (args.length == 3 && args[0].equalsIgnoreCase("settings")) {
+      if (args.length == 3 && args[0].equalsIgnoreCase("settings") && ((args[1].equalsIgnoreCase("title") && (this.hasPermission(sender, "claim.settings.title") || this.hasPermission(sender, "claim.admin.settings.title", LEGACY_ADMIN_PERMISSION))) || (args[1].equalsIgnoreCase("subtitle") && (this.hasPermission(sender, "claim.settings.subtitle") || this.hasPermission(sender, "claim.admin.settings.subtitle", LEGACY_ADMIN_PERMISSION))))) {
          return prefixMatches(List.of("reset"), args[2]);
       }
-      if (args.length == 2 && args[0].equalsIgnoreCase("admin") && sender.hasPermission(ADMIN_PERMISSION)) {
+      if (args.length == 2 && args[0].equalsIgnoreCase("admin") && this.hasPermission(sender, "claim.admin.unclaim", LEGACY_ADMIN_PERMISSION)) {
          return prefixMatches(List.of("unclaim"), args[1]);
       }
       return List.of();
@@ -450,7 +505,8 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
    }
 
    private boolean canBuild(Player player, Claim claim) {
-      return player.getUniqueId().equals(claim.owner) || claim.trusted.containsKey(player.getUniqueId()) || player.hasPermission(ADMIN_PERMISSION);
+      return player.getUniqueId().equals(claim.owner) || claim.trusted.containsKey(player.getUniqueId())
+         || this.hasPermission(player, "claim.admin.bypass", LEGACY_ADMIN_PERMISSION);
    }
 
    private void updateClaimTitle(Player player, Location location) {
@@ -479,6 +535,144 @@ public final class ClaimFeature extends FeatureModule implements CommandExecutor
          }
       }
       return count;
+   }
+
+   private void updateClaimActionBars() {
+      if (!this.isEnabled() || !this.config.getBoolean("actionbar.enabled", true)) {
+         return;
+      }
+      for (Player player : Bukkit.getOnlinePlayers()) {
+         Claim claim = this.claims.get(key(player.getLocation()));
+         if (claim == null) {
+            continue;
+         }
+         int regionSize = this.connectedClaimCounts.getOrDefault(key(player.getLocation()), 1);
+         String extra = regionSize > 1
+            ? this.config.getString("actionbar.multiple-claims-format", " &8(&f%count%&7 verbundene Claims&8)").replace("%count%", Integer.toString(regionSize))
+            : "";
+         String prefix = this.plugin.getConfig().getString("messages.prefix", DEFAULT_PREFIX);
+         String format = this.config.getString("actionbar.format", "%(plugin)prefix% | Chunk -> %spieler%%claims%");
+         String message = format.replace("%(plugin)prefix%", prefix)
+            .replace("%spieler%", claim.ownerName)
+            .replace("%owner%", claim.ownerName)
+            .replace("%count%", Integer.toString(regionSize))
+            .replace("%claims%", extra);
+         message = this.plugin.applyPlaceholders(player, message);
+         player.sendActionBar(LEGACY.deserialize(color(message)));
+      }
+   }
+
+   private int claimLimit(Player player) {
+      if (this.hasPermission(player, "claim.claims.unlimited")
+         || this.hasPermission(player, "claim.admin.unlimited", "system.claim.unlimited")) {
+         return Integer.MAX_VALUE;
+      }
+      int permissionLimit = 0;
+      for (org.bukkit.permissions.PermissionAttachmentInfo permission : player.getEffectivePermissions()) {
+         if (!permission.getValue()) {
+            continue;
+         }
+         String node = permission.getPermission().toLowerCase(Locale.ROOT);
+         if (node.startsWith("claim.claims.")) {
+            String level = node.substring("claim.claims.".length());
+            try {
+               int parsed = Integer.parseInt(level);
+               if (parsed > permissionLimit) {
+                  permissionLimit = parsed;
+               }
+            } catch (NumberFormatException ignored) {
+            }
+         }
+      }
+      return permissionLimit > 0 ? permissionLimit : Math.max(1, this.config.getInt("max-claims-per-player", 10));
+   }
+
+   private double claimCost() {
+      Object configured = this.config.get("cost.claim", "free");
+      String value = String.valueOf(configured).trim();
+      if (value.equalsIgnoreCase("free")) {
+         return 0D;
+      }
+      try {
+         double amount = Double.parseDouble(value);
+         if (Double.isFinite(amount) && amount >= 0D) {
+            return amount;
+         }
+      } catch (NumberFormatException ignored) {
+      }
+      this.plugin.getLogger().warning("Ungültiger Wert für features/claims/config.yml cost.claim: '" + value + "'. Verwende free.");
+      return 0D;
+   }
+
+   private boolean hasUsePermission(CommandSender sender) {
+      return this.hasPermission(sender, USE_PERMISSION)
+         || this.hasFeaturePermission(sender, this.config.getString("permissions.use", USE_PERMISSION));
+   }
+
+   private boolean hasPermission(CommandSender sender, String permission) {
+      return this.hasFeaturePermission(sender, permission);
+   }
+
+   private boolean hasPermission(CommandSender sender, String permission, String legacyPermission) {
+      return this.hasPermission(sender, permission) || this.hasPermission(sender, legacyPermission);
+   }
+
+   private boolean requirePermission(CommandSender sender, String permission) {
+      if (this.hasPermission(sender, permission)) {
+         return true;
+      }
+      this.sendPath(sender, "messages.no-permission", "&cDafür hast du keine Berechtigung.");
+      return false;
+   }
+
+   private boolean canRunClaimAction(Player player, Claim claim, String ownPermission, String adminPermission) {
+      boolean owner = claim.owner.equals(player.getUniqueId());
+      boolean admin = this.hasPermission(player, adminPermission, LEGACY_ADMIN_PERMISSION);
+      if ((!owner && !admin) || (!this.hasPermission(player, ownPermission) && !admin)) {
+         if (!owner && !admin) {
+            this.sendNotOwner(player, claim);
+         } else {
+            this.sendPath(player, "messages.no-permission", "&cDafür hast du keine Berechtigung.");
+         }
+         return false;
+      }
+      return true;
+   }
+
+   private void sendNotOwner(Player player, Claim claim) {
+      this.send(player, this.config.getString("messages.not-owner", "&cNur &e%owner% &ckann diesen Claim verwalten.")
+         .replace("%owner%", claim.ownerName));
+   }
+
+   private void rebuildConnectedClaimCounts() {
+      this.connectedClaimCounts.clear();
+      Set<ChunkKey> remaining = new HashSet<>(this.claims.keySet());
+      while (!remaining.isEmpty()) {
+         ChunkKey start = remaining.iterator().next();
+         Claim ownerClaim = this.claims.get(start);
+         ArrayDeque<ChunkKey> queue = new ArrayDeque<>();
+         List<ChunkKey> component = new ArrayList<>();
+         remaining.remove(start);
+         queue.add(start);
+         while (!queue.isEmpty()) {
+            ChunkKey current = queue.removeFirst();
+            component.add(current);
+            for (ChunkKey neighbor : List.of(
+               new ChunkKey(current.worldId, current.x + 1, current.z),
+               new ChunkKey(current.worldId, current.x - 1, current.z),
+               new ChunkKey(current.worldId, current.x, current.z + 1),
+               new ChunkKey(current.worldId, current.x, current.z - 1)
+            )) {
+               Claim neighborClaim = this.claims.get(neighbor);
+               if (neighborClaim != null && neighborClaim.owner.equals(ownerClaim.owner) && remaining.remove(neighbor)) {
+                  queue.addLast(neighbor);
+               }
+            }
+         }
+         for (ChunkKey key : component) {
+            this.connectedClaimCounts.put(key, component.size());
+         }
+      }
    }
 
    private boolean isDisabledWorld(String worldName) {

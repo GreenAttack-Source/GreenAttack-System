@@ -1,11 +1,24 @@
 enabled: true
 
 permissions:
-  use: "system.claim.use"
+  use: "claim.use"
 
-# Chunk claims haben keinen Kaufpreis. Der Standard erlaubt zehn Claims pro Spieler.
+# Der Standard erlaubt zehn Claims pro Spieler; den Kaufpreis je Chunk stellst du unten ein.
+# Ein LuckPerms-Recht claim.claims.N setzt das persönliche Maximum auf N.
+# Erlaubt sind beliebige positive Zahlen; den höchsten vergebenen Wert gewinnt.
+# claim.claims.unlimited hebt das Limit auf. Ohne Zahlen-Recht gilt der Config-Standard.
 max-claims-per-player: 10
 disabled-worlds: []
+
+cost:
+  claim: free # `free` or an Economy amount charged per claimed chunk
+
+actionbar:
+  enabled: true
+  # %spieler% ist der Claim-Besitzer. %(plugin)prefix% wird durch den Plugin-Prefix ersetzt.
+  format: "%(plugin)prefix% | Chunk -> %spieler%%claims%"
+  # Wird nur bei zusammenhängenden Claims desselben Besitzers angezeigt.
+  multiple-claims-format: " &8(&f%count%&7 verbundene Claims&8)"
 
 # Diese Standardtexte erscheinen beim Betreten eines Claims, sofern dort kein eigener Text gesetzt ist.
 defaults:
@@ -22,9 +35,11 @@ messages:
   no-permission: "&cDafür hast du keine Berechtigung."
   player-only: "&cDiesen Befehl können nur Spieler verwenden."
   world-disabled: "&cClaims sind in dieser Welt deaktiviert."
-  claimed: "&aChunk gesichert. Claims sind kostenlos. &7(&f%count%&7/&f%limit%&7)"
+  claimed: "&aChunk gesichert. &7Claims: &f%count%&7/&f%limit%"
   already-claimed: "&cDieser Chunk gehört bereits &e%owner%&c."
-  claim-limit: "&cDu hast dein Limit von &e%limit% &cChunks erreicht."
+  claim-limit: "&cDu hast dein Claim-Limit erreicht."
+  economy-unavailable: "&cDas Wirtschaftssystem ist nicht verfügbar."
+  not-enough-money: "&cEin Claim kostet &e%cost%&c."
   not-claimed: "&cDieser Chunk ist nicht gesichert."
   not-owner: "&cNur &e%owner% &ckann diesen Claim verwalten."
   unclaimed: "&aDer Chunk ist jetzt wieder frei."
@@ -43,4 +58,4 @@ messages:
   info: "&aClaim von &e%owner%&a. Vertraut: &f%trusted%"
   admin-usage: "&7Verwendung: &f/claim admin unclaim"
   admin-unclaimed: "&aClaim administrativ entfernt."
-  help: "&a/claim &7Chunk kostenlos sichern | &a/claim unclaim &7freigeben | &a/claim trust add <Spieler> &7vertrauen | &a/claim trust remove <Spieler> &7entfernen | &a/claim trust list | &a/claim settings <title|subtitle> <Text|reset> &7Anzeige ändern | &a/claim info"
+  help: "&a/claim &7Chunk sichern | &a/claim unclaim &7freigeben | &a/claim trust add <Spieler> &7vertrauen | &a/claim trust remove <Spieler> &7entfernen | &a/claim trust list | &a/claim settings <title|subtitle> <Text|reset> &7Anzeige ändern | &a/claim info"
