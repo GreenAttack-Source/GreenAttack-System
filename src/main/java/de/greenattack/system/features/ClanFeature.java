@@ -2563,8 +2563,16 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
                      }
                   }
                   break;
-               case "kick":
                case "setrole":
+                  if (me != null) {
+                     current.membersOf(me.clanKey).stream()
+                        .filter(member -> !member.uuid.equals(player.getUniqueId()))
+                        .sorted(Comparator.comparing((MemberData member) -> member.name, String.CASE_INSENSITIVE_ORDER))
+                        .map(member -> member.name)
+                        .forEach(options::add);
+                  }
+                  break;
+               case "kick":
                case "transfer":
                   if (me != null) {
                      for (MemberData member : current.membersOf(me.clanKey)) {
