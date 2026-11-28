@@ -90,6 +90,6 @@ Wenn eine Funktion in einem Feature-Config-Ordner geändert wurde, lädt `/green
 
 ## Bauen und installieren
 
-Zum Bauen des JAR-Plugins wird ein JDK benötigt, und unter Windows kann der Build im Hauptordner des Repositorys mit `.\gradlew.bat jar sourcesJar` ausgeführt werden; die JAR-Datei wird danach unter `lib/GreenAttack-System-3.9.jar` abgelegt.
+Zum Bauen des JAR-Plugins wird ein JDK benötigt, und unter Windows kann der Build im Hauptordner des Repositorys mit `.\gradlew.bat jar sourcesJar` ausgeführt werden; die JAR-Datei wird danach unter `lib/GreenAttack-System-3.8.jar` abgelegt.
 
 Das Quellcode-Archiv soll zusammen mit den Gradle-Dateien und dem kompletten `src`-Ordner verteilt werden, damit das Projekt ohne Dekompilierung geöffnet und verändert werden kann; für Paper 1.21.11 wird Java 21 benötigt, während neuere Paper-Versionen ihre jeweils unterstützte Server-Java-Version voraussetzen.

@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'de.greenattack'
-version = '3.9'
+version = '3.8'
 
 repositories {
     mavenCentral()
