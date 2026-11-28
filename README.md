@@ -53,7 +53,7 @@ Die Clan-Datenbank und Clan-Optionen stehen in `plugins/GreenAttack-System/featu
 
 Einfarbige eigene Clan-Farben werden als `#RRGGBB` eingegeben. Für einen Tag-Verlauf gibst du zwei bis fünf Hex-Farben mit Doppelpunkten getrennt ein, zum Beispiel `#ff0000:#ff8800:#ffff00`; der Farbverlauf wird Zeichen für Zeichen auf den Clan-Tag gelegt.
 
-`/clan sethome <Name>` speichert ausschließlich ein Clan-Home. Es löscht keine Clan-, Mitglieds- oder Rollen-Daten. `/clan delete` verlangt eine anschließende Bestätigung mit `/clan confirm`; der Admin-Befehl zum Auflösen verlangt ebenfalls zwei Schritte und protokolliert den bestätigten Vorgang im Server-Log.
+`/clan home` zeigt die Clan-Homes mit Namen und Server an; mit `/clan home <Name>` teleportierst du zu einem ausgewählten Home, und die Namen werden beim Tippen als Vorschläge angeboten. `/clan homes` zeigt dieselbe Liste. `/clan sethome <Name>` oder kurz `/clan seth <Name>` speichert ein Home, `/clan delhome <Name>` oder `/clan delh <Name>` entfernt es. Diese Befehle ändern keine Clan-, Mitglieds- oder Rollen-Daten. `/clan delete` verlangt eine anschließende Bestätigung mit `/clan confirm`; der Admin-Befehl zum Auflösen verlangt ebenfalls zwei Schritte und protokolliert den bestätigten Vorgang im Server-Log.
 
 Die Befehle `/greenattack reload` und `/slots <Anzahl>` sind mit `system.admin` geschützt, wobei der Reload die Hauptkonfiguration und die von GreenAttack verwalteten Features neu einliest und die Slotänderung das Spielerlimit dieses einzelnen Backend-Servers aktualisiert.
 
@@ -90,6 +90,6 @@ Wenn eine Funktion in einem Feature-Config-Ordner geändert wurde, lädt `/green
 
 ## Bauen und installieren
 
-Zum Bauen des JAR-Plugins wird ein JDK benötigt, und unter Windows kann der Build im Hauptordner des Repositorys mit `.\gradlew.bat jar sourcesJar` ausgeführt werden; die JAR-Datei wird danach unter `lib/GreenAttack-System-3.8.jar` abgelegt.
+Zum Bauen des JAR-Plugins wird ein JDK benötigt, und unter Windows kann der Build im Hauptordner des Repositorys mit `.\gradlew.bat jar sourcesJar` ausgeführt werden; die JAR-Datei wird danach unter `lib/GreenAttack-System-3.9.jar` abgelegt.
 
 Das Quellcode-Archiv soll zusammen mit den Gradle-Dateien und dem kompletten `src`-Ordner verteilt werden, damit das Projekt ohne Dekompilierung geöffnet und verändert werden kann; für Paper 1.21.11 wird Java 21 benötigt, während neuere Paper-Versionen ihre jeweils unterstützte Server-Java-Version voraussetzen.

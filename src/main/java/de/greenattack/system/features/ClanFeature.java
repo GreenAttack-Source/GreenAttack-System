@@ -737,16 +737,18 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          case "settings":
             this.handleSettings(sender, args);
             break;
-         case "sethome": {
+         case "sethome":
+         case "seth": {
             Player player = this.requirePlayer(sender);
-            if (player != null && this.requireArgs(sender, args, 2, "sethome <Name>")) {
+            if (player != null && this.requireArgs(sender, args, 2, "sethome|seth <Name>")) {
                this.setHome(player, args[1], null);
             }
             break;
          }
-         case "delhome": {
+         case "delhome":
+         case "delh": {
             Player player = this.requirePlayer(sender);
-            if (player != null && this.requireArgs(sender, args, 2, "delhome <Name>")) {
+            if (player != null && this.requireArgs(sender, args, 2, "delhome|delh <Name>")) {
                this.deleteHome(player, args[1], null);
             }
             break;
@@ -754,7 +756,13 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          case "home": {
             Player player = this.requirePlayer(sender);
             if (player != null) {
-               this.teleportHome(player, args.length >= 2 ? args[1] : null);
+               if (args.length == 1) {
+                  this.handleHomesList(sender);
+               } else if (args.length == 2) {
+                  this.teleportHome(player, args[1]);
+               } else {
+                  this.tell(sender, "messages.usage-generic", "&7Verwendung: &f/clan %usage%", "usage", "home [Name]");
+               }
             }
             break;
          }
@@ -797,7 +805,8 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          "&f/clan delete &7- Löschbestätigung anfordern (nur Owner)", "&f/clan confirm &7- Clan endgültig löschen",
          "&f/clan info [Clan] &7| &f/clan members",
          "&f/clan list &7| &f/clan top", "&f/clan chat [Nachricht] &7| &f/cc <Nachricht>", "&f/clan kick <Spieler> &7| &f/clan setrole <Spieler> <Rolle>",
-         "&f/clan roles &7| &f/clan role <create|delete|weight|perm|info> ...", "&f/clan home [Name] &7| &f/clan sethome|delhome <Name> &7| &f/clan homes",
+         "&f/clan roles &7| &f/clan role <create|delete|weight|perm|info> ...", "&f/clan home &7- Clan-Homes anzeigen | &f/clan home <Name> &7- teleportieren",
+         "&f/clan sethome|seth <Name> &7| &f/clan delhome|delh <Name> &7| &f/clan homes",
          "&f/clan color <Farbe> &7| &f/clan style <normal|bold> &7| &f/clan rename <Name> &7| &f/clan settag <Tag>", "&f/clan settings join <invite|close|open>",
          "&f/clan transfer <Spieler>"}) {
          this.send(sender, color(line));
@@ -2283,6 +2292,10 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
    }
 
    void teleportHome(Player player, String name) {
+      if (name == null || name.isBlank()) {
+         this.handleHomesList(player);
+         return;
+      }
       Snapshot current = this.snapshot;
       MemberData me = current.members.get(player.getUniqueId());
       if (me == null) {
@@ -2293,23 +2306,9 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          this.tell(player, "messages.no-rights", "&cDazu hast du im Clan keine Rechte.");
          return;
       }
-      List<HomeData> homes = current.homesOf(me.clanKey);
-      HomeData home = null;
-      if (name == null) {
-         if (homes.size() == 1) {
-            home = homes.get(0);
-         } else if (homes.isEmpty()) {
-            this.tell(player, "messages.homes-empty", "&7Dein Clan hat noch kein Home. Setze eins mit &f/clan sethome <Name>&7.");
-            return;
-         } else {
-            this.tell(player, "messages.home-choose", "&7Dein Clan hat mehrere Homes. Nutze &f/clan home <Name>&7. Siehe &f/clan homes&7.");
-            return;
-         }
-      } else {
-         home = current.home(me.clanKey, name);
-      }
+      HomeData home = current.home(me.clanKey, name);
       if (home == null) {
-         this.tell(player, "messages.home-unknown", "&cEs gibt kein Clan-Home &e%home%&c.", "home", name == null ? "" : name);
+         this.tell(player, "messages.home-unknown", "&cEs gibt kein Clan-Home &e%home%&c.", "home", name);
          return;
       }
 
@@ -2376,6 +2375,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
       for (HomeData home : homes) {
          this.send(sender, this.msg("messages.homes-line", "&8- &e%home% &7(%server%)", "home", home.name, "server", home.serverId.isEmpty() ? "lokal" : home.serverId));
       }
+      this.tell(sender, "messages.homes-use", "&7Teleportiere mit &f/clan home <Name>&7.");
    }
 
    // ------------------------------------------------------------------ Admin
@@ -2688,7 +2688,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          MemberData me = current.members.get(player.getUniqueId());
          if (args.length == 1) {
             options.addAll(Arrays.asList("menu", "create", "invite", "accept", "deny", "join", "leave", "delete", "info", "list", "top", "members", "chat", "kick", "setrole", "roles",
-               "role", "color", "style", "rename", "settag", "settings", "home", "sethome", "delhome", "homes", "transfer", "help"));
+               "role", "color", "style", "rename", "settag", "settings", "home", "sethome", "seth", "delhome", "delh", "homes", "transfer", "help"));
             PendingDeleteConfirmation pending = this.pendingDeleteConfirmations.get(player.getUniqueId());
             if (me == null || !ClanModel.OWNER.equals(me.roleKey) || pending == null || !pending.clanKey().equals(me.clanKey)
                || (!player.hasPermission(DELETE_CONFIRM_BYPASS_PERMISSION) && pending.expiresAt() <= System.currentTimeMillis())) {
@@ -2744,6 +2744,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
                   break;
                case "home":
                case "delhome":
+               case "delh":
                   if (me != null) {
                      for (HomeData home : current.homesOf(me.clanKey)) {
                         options.add(home.name);
