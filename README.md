@@ -1,6 +1,6 @@
 # GreenAttack-System
 
-GreenAttack-System ist ein Paper-Plugin mit SMP-Claims, Teleport- und Homesystem, Economy, Markt, Rängen, Clans, Inventarwerkzeugen und administrativen Serverfunktionen. Der Quellcode wird mit der Paper-API 1.21.11 und Java-21-Bytecode gebaut, und die Plugin-Version ist für Paper 1.21.11 bis 26.3 vorgesehen.
+GreenAttack-System ist ein Minecraft-Server-Plugin **ausschließlich für PaperMC, Bukkit und Spigot** (nicht für Velocity, Forge, Fabric oder Bedrock) mit SMP-Claims, Teleport- und Homesystem, Economy, Markt, Rängen, Clans, Inventarwerkzeugen und administrativen Serverfunktionen. Der Quellcode wird mit der Paper-API 1.21.11 und Java-21-Bytecode gebaut und ist für PaperMC / Bukkit / Spigot 1.21.11 bis 26.3 vorgesehen.
 
 Die installierbare Plugin-Datei und die vollständigen Quellcodes werden getrennt bereitgestellt: Die JAR-Datei liegt bei den [GitHub-Releases](https://github.com/GreenAttack-Source/GreenAttack-System/releases), während das Haupt-Repository den lesbaren Quellcode und die Build-Dateien enthält.
 
