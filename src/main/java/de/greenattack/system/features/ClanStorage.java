@@ -40,7 +40,11 @@ interface ClanStorage {
 
    void transferOwnership(String clanKey, UUID from, UUID to) throws Exception;
 
-   boolean disband(String clanKey) throws Exception;
+   /** Entfernt einen Clan nur, wenn der bestaetigende Spieler dort weiterhin Owner ist. */
+   List<UUID> disbandOwnedClan(String clanKey, UUID owner, long createdAt) throws Exception;
+
+   /** Loest den beim ersten Admin-Befehl bestaetigten Clan nur mit derselben Erstellungs-ID auf. */
+   boolean disbandConfirmed(String clanKey, long createdAt) throws Exception;
 
    void setColor(String clanKey, String color) throws Exception;
 
@@ -170,7 +174,7 @@ interface ClanStorage {
          try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + this.clans + " ("
                + "clan_key VARCHAR(24) NOT NULL, clan_name VARCHAR(24) NOT NULL, tag VARCHAR(8) NOT NULL, tag_key VARCHAR(8) NOT NULL, "
-               + "color VARCHAR(16) NOT NULL, tag_style VARCHAR(16) NOT NULL DEFAULT 'normal', created_at BIGINT NOT NULL, "
+               + "color VARCHAR(128) NOT NULL, tag_style VARCHAR(16) NOT NULL DEFAULT 'normal', created_at BIGINT NOT NULL, "
                + "join_mode VARCHAR(8) NOT NULL DEFAULT 'invite', "
                + "PRIMARY KEY (clan_key), UNIQUE KEY uk_tag_key (tag_key)) DEFAULT CHARSET=utf8mb4");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS " + this.members + " ("
@@ -203,6 +207,7 @@ interface ClanStorage {
                }
             }
             statement.executeUpdate("ALTER TABLE " + this.members + " MODIFY member_role VARCHAR(16) NOT NULL");
+            statement.executeUpdate("ALTER TABLE " + this.clans + " MODIFY color VARCHAR(128) NOT NULL");
             statement.executeUpdate("UPDATE " + this.members + " SET member_role = 'owner' WHERE member_role = 'LEADER'");
             statement.executeUpdate("UPDATE " + this.members + " SET member_role = 'member' WHERE member_role IN ('MODERATOR', 'MEMBER')");
          }
@@ -263,10 +268,17 @@ interface ClanStorage {
          }
       }
 
-      private static boolean exists(Connection connection, String sql, String... values) throws SQLException {
+      private static boolean exists(Connection connection, String sql, Object... values) throws SQLException {
          try (PreparedStatement statement = connection.prepareStatement(sql)) {
             for (int index = 0; index < values.length; index++) {
-               statement.setString(index + 1, values[index]);
+               Object value = values[index];
+               if (value instanceof Long number) {
+                  statement.setLong(index + 1, number);
+               } else if (value instanceof Integer number) {
+                  statement.setInt(index + 1, number);
+               } else {
+                  statement.setString(index + 1, String.valueOf(value));
+               }
             }
             try (ResultSet rows = statement.executeQuery()) {
                return rows.next();
@@ -413,12 +425,57 @@ interface ClanStorage {
       }
 
       @Override
-      public boolean disband(String clanKey) throws SQLException {
+      public List<UUID> disbandOwnedClan(String clanKey, UUID owner, long createdAt) throws SQLException {
          return this.transaction(connection -> {
+            if (!exists(connection, "SELECT 1 FROM " + this.clans + " WHERE clan_key = ? AND created_at = ? FOR UPDATE", clanKey, createdAt)) {
+               return null;
+            }
+            try (PreparedStatement statement = connection.prepareStatement("SELECT member_role FROM " + this.members
+               + " WHERE player_uuid = ? AND clan_key = ? FOR UPDATE")) {
+               statement.setString(1, owner.toString());
+               statement.setString(2, clanKey);
+               try (ResultSet rows = statement.executeQuery()) {
+                  if (!rows.next() || !ClanModel.OWNER.equals(rows.getString(1))) {
+                     return null;
+                  }
+               }
+            }
+
+            List<UUID> memberIds = new ArrayList<>();
+            try (PreparedStatement statement = connection.prepareStatement("SELECT player_uuid FROM " + this.members
+               + " WHERE clan_key = ? FOR UPDATE")) {
+               statement.setString(1, clanKey);
+               try (ResultSet rows = statement.executeQuery()) {
+                  while (rows.next()) {
+                     try {
+                        memberIds.add(UUID.fromString(rows.getString(1)));
+                     } catch (IllegalArgumentException ignored) {
+                        // Ungueltige UUIDs sollen die bestaetigte Clan-Loeschung nicht verhindern.
+                     }
+                  }
+               }
+            }
+
             execute(connection, "DELETE FROM " + this.homes + " WHERE clan_key = ?", clanKey);
             execute(connection, "DELETE FROM " + this.roles + " WHERE clan_key = ?", clanKey);
             execute(connection, "DELETE FROM " + this.members + " WHERE clan_key = ?", clanKey);
-            return execute(connection, "DELETE FROM " + this.clans + " WHERE clan_key = ?", clanKey) > 0;
+            if (execute(connection, "DELETE FROM " + this.clans + " WHERE clan_key = ? AND created_at = ?", clanKey, createdAt) == 0) {
+               return null;
+            }
+            return memberIds;
+         });
+      }
+
+      @Override
+      public boolean disbandConfirmed(String clanKey, long createdAt) throws SQLException {
+         return this.transaction(connection -> {
+            if (!exists(connection, "SELECT 1 FROM " + this.clans + " WHERE clan_key = ? AND created_at = ? FOR UPDATE", clanKey, createdAt)) {
+               return false;
+            }
+            execute(connection, "DELETE FROM " + this.homes + " WHERE clan_key = ?", clanKey);
+            execute(connection, "DELETE FROM " + this.roles + " WHERE clan_key = ?", clanKey);
+            execute(connection, "DELETE FROM " + this.members + " WHERE clan_key = ?", clanKey);
+            return execute(connection, "DELETE FROM " + this.clans + " WHERE clan_key = ? AND created_at = ?", clanKey, createdAt) > 0;
          });
       }
 

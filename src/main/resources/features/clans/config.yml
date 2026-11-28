@@ -48,15 +48,16 @@ default-join-mode: invite
 # ---------------------------------------------------------------------------
 # Preise
 # ---------------------------------------------------------------------------
-create-cost: 250000          # Economy-Dollar fuer /clan create; alternativ "free" fuer kostenlose Gruendung
+create-cost: free            # Economy-Dollar fuer /clan create; alternativ "free" fuer kostenlose Gruendung
 rename-cost: 0               # Economy-Dollar fuer eine Namensaenderung (0 = gratis)
-color-cost-normal: 100       # Kristalle fuer eine Farbe wie pink, gold, aqua ...
-color-cost-hex: 250          # Kristalle fuer eine freie Hex-Farbe wie #ff8800
+color-currency: crystals     # crystals oder economy; gilt fuer beide Tag-Farbpreise
+color-cost-normal: free      # Preis fuer eine Standardfarbe; Zahl oder free
+color-cost-hex: free         # Preis fuer Hex-Farbe/Farbverlauf; Zahl oder free
 
 # ---------------------------------------------------------------------------
 # Aussehen: der Tag erscheint immer in GROSSBUCHSTABEN als [TAG].
 # ---------------------------------------------------------------------------
-default-color: pink          # Farbe neuer Clans (Name oder #RRGGBB)
+default-color: pink          # Farbe neuer Clans: Name, #RRGGBB oder Verlauf #ff0000:#0000ff
 bracket-color: "&7"
 
 # Regeln
@@ -89,7 +90,7 @@ luckperms-suffix:
 messages:
   action-self: "&cDas geht nicht mit dir selbst."
   admin-disband: "&aDer Clan &e%clan% &awurde aufgelöst."
-  admin-is-owner: "&e%player% &cist Owner eines Clans mit weiteren Mitgliedern. Löse den Clan mit &f/clanadmin disband &cauf."
+  admin-is-owner: "&e%player% &cist Clan-Owner und kann nicht gekickt werden. Nutze zum Auflösen &f/clanadmin disband <Clan>&c und bestätige danach."
   admin-kick: "&e%player% &awurde aus dem Clan &e%value% &aentfernt."
   admin-no-member: "&cDer Spieler &e%player% &cist in keinem Clan."
   admin-setcolor: "&aDie Tag-Farbe von &e%clan% &awurde geändert."
@@ -105,7 +106,7 @@ messages:
   clan-full: "&cDein Clan ist voll."
   clan-gone: "&cDen Clan &e%clan% &cgibt es nicht (mehr)."
   clan-not-open: "&cDer Clan &e%clan% &cist nicht offen. Du brauchst eine Einladung."
-  color-done: "&aDie Tag-Farbe wurde geändert. &7(%cost% Kristalle)"
+  color-done: "&aDie Tag-Farbe wurde geändert. &7(%cost%)"
   invalid-style: "&cDer Clan-Tag-Stil muss &enormal &coder &ebold &csein."
   same-style: "&cDein Clan nutzt diesen Tag-Stil bereits."
   style-done: "&aDer Clan-Tag-Stil ist jetzt &e%style%&a. Die Änderung ist kostenlos."
@@ -117,6 +118,8 @@ messages:
   disabled: "&cDas Clan-System ist derzeit deaktiviert."
   delete-confirm: "&cBist du wirklich sicher, dass du den Clan &e%clan% &clöschen möchtest? Bestätige innerhalb von 60 Sekunden mit &f/clan confirm&c."
   delete-confirm-expired: "&cEs gibt keine gültige Löschbestätigung. Starte mit &f/clan delete&c."
+  admin-disband-confirm: "&cClan &e%clan% &cwird aufgelöst. Bestätige innerhalb von 60 Sekunden mit &f/clanadmin disband %clan% confirm&c."
+  admin-disband-expired: "&cKeine aktive Auflösungsbestätigung. Starte mit &f/clanadmin disband <Clan>&c."
   deleted: "&aDer Clan &e%clan% &awurde gelöscht."
   owner-delete-required: "&cDer Clan-Leader kann nicht austreten. Übertrage die Leitung mit &f/clan transfer <Spieler> &coder lösche den Clan mit &f/clan delete&c."
   economy-missing: "&cDas Wirtschaftssystem ist nicht verfügbar."
@@ -138,7 +141,7 @@ messages:
   info-members: "&7Mitglieder: &f%online%&7/&f%count% &7online"
   info-owner: "&7Owner: &f%owner%"
   info-status: "&7Gegründet: &f%created% &8| &7Beitritt: &f%mode%"
-  invalid-color: "&cUnbekannte Farbe. Erlaubt sind Farbnamen wie pink, gold, aqua oder Hex wie #ff8800."
+  invalid-color: "&cUnbekannte Farbe. Erlaubt sind Namen, #RRGGBB oder Verläufe wie #ff0000:#0000ff."
   invalid-home-name: "&cHome-Namen dürfen nur Buchstaben, Zahlen, _ und - enthalten (1 bis 16 Zeichen)."
   invalid-name: "&cDer Clan-Name darf nur Buchstaben, Zahlen, _ und - enthalten (%min% bis %max% Zeichen)."
   invalid-permission: "&cUnbekanntes Recht. Möglich: &f%list%"
@@ -175,6 +178,7 @@ messages:
   no-permissions: "keine Rechte"
   no-rights: "&cDazu hast du im Clan keine Rechte."
   not-enough-kristalle: "&cEine neue Tag-Farbe kostet &b%cost% Kristalle&c. Du hast &b%balance%&c."
+  not-enough-color-currency: "&cDie Tag-Farbe kostet &e%cost%&c. Dein Kontostand: &e%balance%&c."
   not-enough-money: "&cDie Clan-Gründung kostet &e%cost%&c. Dir fehlt Geld."
   not-enough-money-rename: "&cDie Umbenennung kostet &e%cost%&c. Dir fehlt Geld."
   not-in-clan: "&cDu bist in keinem Clan."
@@ -184,7 +188,7 @@ messages:
   player-only: "&cDiesen Befehl kann nur ein Spieler verwenden."
   prompt-cancel: "&7Zum Abbrechen schreibe &fabbrechen&7."
   prompt-cancelled: "&7Abgebrochen."
-  prompt-hex: "&aSchreibe die Farbe als &f#RRGGBB &ain den Chat, zum Beispiel &f#ff8800&a."
+  prompt-hex: "&aSchreibe &f#RRGGBB &aoder einen Verlauf wie &f#ff0000:#0000ff &ain den Chat."
   prompt-home: "&aSchreibe den Namen für das Clan-Home in den Chat."
   prompt-rename: "&aSchreibe den neuen Clan-Namen in den Chat."
   prompt-role: "&aSchreibe &fName Gewicht &ain den Chat, zum Beispiel &fsupporter 50&a."
@@ -225,4 +229,4 @@ messages:
   usage-role: "&7Verwendung: &f/clan role <create <Name> <Gewicht> | delete <Name> | weight <Name> <Gewicht> | perm <Name> <Recht> [on|off] | info <Name>>"
   list-header: "&aAlle Clans:"
   top-header: "&aGrößte Clans:"
-  usage-admin: "&7Verwendung: &f/clanadmin <disband <Clan> | kick <Spieler> | settag <Clan> <Tag> | setcolor <Clan> <Farbe>>"
+  usage-admin: "&7Verwendung: &f/clanadmin <disband <Clan> [confirm] | kick <Spieler> | settag <Clan> <Tag> | setcolor <Clan> <Farbe>>"

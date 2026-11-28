@@ -139,7 +139,7 @@ public final class ClanMenus {
          (p, right) -> this.guarded(p, "roles_view", () -> this.openRoles(p)));
       this.put(holder, 12, this.item("RED_BED", "&aClan-Homes", lines("&7Homes: &f" + current.homesOf(me.clanKey).size() + "&7/&f" + this.feature.maxHomes(), this.hint(current.can(me, "home_use")))),
          (p, right) -> this.guarded(p, "home_use", () -> this.openHomes(p)));
-      this.put(holder, 13, this.item("PINK_DYE", "&aTag-Farbe", lines("&7Farbe deines Clan-Tags ändern.", "&7Kostet Kristalle.", this.hint(current.can(me, "color")))),
+      this.put(holder, 13, this.item("PINK_DYE", "&aTag-Farbe", lines("&7Farbe deines Clan-Tags ändern.", "&7Kosten: je nach Clan-Konfiguration.", this.hint(current.can(me, "color")))),
          (p, right) -> this.guarded(p, "color", () -> this.openColors(p)));
       this.put(holder, 14, this.item("COMPARATOR", "&aEinstellungen", lines("&7Beitritt: &f" + this.feature.joinModeLabel(clan.joinMode), this.hint(current.can(me, "settings")))),
          (p, right) -> this.openSettings(p));
@@ -439,11 +439,11 @@ public final class ClanMenus {
          final String stored = ClanFeature.parseColor(entry[0]);
          boolean active = clan != null && clan.color.equalsIgnoreCase(stored);
          String shown = ClanFeature.legacyColor(stored).replace('§', '&') + entry[0];
-         this.put(holder, slot++, this.item(entry[1], shown, lines(active ? "&aAktuelle Farbe" : "&7Kosten: &b" + this.feature.colorCost(stored) + " Kristalle", "&7Vorschau: " + this.feature.formatTag(new ClanData(clan.key, clan.name, clan.tag, stored, clan.tagStyle, clan.createdAt, clan.joinMode)))),
+         this.put(holder, slot++, this.item(entry[1], shown, lines(active ? "&aAktuelle Farbe" : "&7Kosten: &b" + this.feature.colorCostLabel(stored), "&7Vorschau: " + this.feature.formatTag(new ClanData(clan.key, clan.name, clan.tag, stored, clan.tagStyle, clan.createdAt, clan.joinMode)))),
             (p, right) -> this.feature.buyColor(p, stored, () -> this.openColors(p)));
       }
-      this.put(holder, 31, this.item("NAME_TAG", "&bEigene Hex-Farbe", lines("&7Klick, dann im Chat: &f#RRGGBB", "&7Kosten: &b" + this.feature.colorCost("#ffffff") + " Kristalle")),
-         (p, right) -> this.feature.startPrompt(p, "hex", "", "messages.prompt-hex", "&aSchreibe die Farbe als &f#RRGGBB &ain den Chat, zum Beispiel &f#ff8800&a."));
+      this.put(holder, 31, this.item("NAME_TAG", "&bEigene Hex-Farbe / Verlauf", lines("&7Klick, dann im Chat: &f#RRGGBB", "&7Farbverlauf: &f#ff0000:#0000ff", "&7Kosten: &b" + this.feature.colorCostLabel("#ffffff"))),
+         (p, right) -> this.feature.startPrompt(p, "hex", "", "messages.prompt-hex", "&aSchreibe &f#RRGGBB &aoder einen Verlauf wie &f#ff0000:#0000ff &ain den Chat."));
       this.back(holder, 35, () -> this.openMain(player));
       this.show(player, holder);
    }

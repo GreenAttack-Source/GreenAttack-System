@@ -35,7 +35,7 @@ Die folgenden Befehle sind die wichtigsten Spieler- und Teamfunktionen; jede ang
 | `/market` oder `/markt` | `system.market.use` und `system.market.admin` | Das erste Recht öffnet den dynamischen Markt mit den Kategorien, während die Adminberechtigung das Nachladen der Konfiguration und das Zurücksetzen dynamischer Marktbestände ermöglicht. |
 | `/rank` oder `/ränge` und `/rank reload` | `system.rank.use` und `system.rank` | Das Spielerrecht öffnet den Rangmarkt und erlaubt Rangkäufe, während das Adminrecht die Rangkonfiguration neu lädt. |
 | `/aktionshaus` oder `/ah` | `system.aktionshaus.use` und `system.aktionshaus.admin` | Das Spielerrecht öffnet das Aktionshaus für Kauf und Verkauf, während das Adminrecht die administrative Verwaltung der Angebote freischaltet. |
-| `/clan`, `/clan delete`, `/clan confirm`, `/clan setrole <Spieler> <Rolle>`, `/cc <Nachricht>` und `/clanadmin ...` | `system.clan.use`, `system.clan.create`, `system.clan.color`, `system.clan.admin` und `clan.delete.confirm.bypass` | Das Clan-Recht erlaubt die normalen Clanbefehle und den Clan-Chat, während Erstellen, Farbänderungen, Teamverwaltung und das Umgehen der Ablaufzeit einer bereits angeforderten Löschbestätigung über separate Rechte gesteuert werden; beim ersten Argument von `setrole` werden ausschließlich die anderen Mitglieder des eigenen Clans alphabetisch vorgeschlagen, und nach der Spielerauswahl erscheinen die Rollen dieses Clans, die der ausführende Spieler auswählen kann. |
+| `/clan`, `/clan delete`, `/clan confirm`, `/clan setrole <Spieler> <Rolle>`, `/cc <Nachricht>` und `/clanadmin ...` | `system.clan.use`, `system.clan.create`, `system.clan.color`, `system.clan.admin` und `clan.delete.confirm.bypass` | Clan-Befehle und Clan-Chat nutzen das Spielerrecht, Erstellen und Farbänderungen haben eigene Rechte, und `/clanadmin disband <Clan>` muss mit `/clanadmin disband <Clan> confirm` bestätigt werden; beim `setrole`-Autocomplete werden nur Mitglieder des eigenen Clans angeboten. |
 | `/home [Name]`, `/sethome [Name]`, `/delhome [Name]` und `/renamehome <alt> <neu>` | `system.home`, `system.home.set` und `system.home.N` | Das Home-Recht verwaltet und besucht gespeicherte Homes, das Set-Recht erlaubt Änderungen, und ein Zahlenrecht wie `system.home.5` setzt das persönliche Speicherlimit. |
 | `/homeadmin [set|remove] <Spieler> [Home]` | `system.home.admin` | Ein Teammitglied verwaltet oder besucht die Homes eines anderen Spielers, ohne dessen normale Home-Rechte ändern zu müssen. |
 | `/kit set` | `system.kit.admin` | Ein Administrator speichert sein aktuelles Inventar einschließlich Rüstung und Nebenhand als Starterkit, das neuen Spielern beim Beitritt ausgegeben wird. |
@@ -46,6 +46,14 @@ Die folgenden Befehle sind die wichtigsten Spieler- und Teamfunktionen; jede ang
 | `/db [hand]`, `/news`, `/newsconfig`, `/halloween` und `/isign` | `system.db.use`, `system.db.add`, `system.db.admin`, `system.news.view`, `system.news.config`, `system.halloween.user`, `system.halloween.set`, `system.halloween.reset` und `system.isign` | Diese Rechte steuern getrennt die Item-Datenbank, das Hinzufügen oder Löschen ihrer Einträge, die Anzeige und Bearbeitung von Neuigkeiten, das Sammeln und Verwalten von Halloween-Köpfen sowie das Signieren von Items. |
 | `/one-klick` oder `/oneclick`, `/ka`, `/kristall` und `/kristalle` | `system.oneclick.admin`, `system.kristall.admin` und das Legacy-Recht `kristallsystem.admin` | Das Team markiert erlaubte Werkzeuge für One-Klick und verwaltet die Kristallkonten, wobei die frühere Kristall-System-Permission zur Kompatibilität weiterhin erkannt wird. |
 | `/customcmd <list|reload|create|delete>` und `/performance` | `system.customcmd.admin` und `system.monitoring.admin` | Das Custom-Command-Recht verwaltet die in `features/create-cmds/config.yml` gespeicherten Zusatzbefehle, während die Performance-Berechtigung den globalen Anzeige-Modus ändert. |
+
+## Clan-Einstellungen
+
+Die Clan-Datenbank und Clan-Optionen stehen in `plugins/GreenAttack-System/features/clans/config.yml`. Eine frische Konfiguration setzt `create-cost`, `color-cost-normal` und `color-cost-hex` auf `free`; für kostenpflichtige Farben kannst du unter `color-currency` entweder `crystals` oder `economy` wählen und bei den beiden Farbpreisen jeweils `free` oder einen Betrag eintragen.
+
+Einfarbige eigene Clan-Farben werden als `#RRGGBB` eingegeben. Für einen Tag-Verlauf gibst du zwei bis fünf Hex-Farben mit Doppelpunkten getrennt ein, zum Beispiel `#ff0000:#ff8800:#ffff00`; der Farbverlauf wird Zeichen für Zeichen auf den Clan-Tag gelegt.
+
+`/clan sethome <Name>` speichert ausschließlich ein Clan-Home. Es löscht keine Clan-, Mitglieds- oder Rollen-Daten. `/clan delete` verlangt eine anschließende Bestätigung mit `/clan confirm`; der Admin-Befehl zum Auflösen verlangt ebenfalls zwei Schritte und protokolliert den bestätigten Vorgang im Server-Log.
 
 Die Befehle `/greenattack reload` und `/slots <Anzahl>` sind mit `system.admin` geschützt, wobei der Reload die Hauptkonfiguration und die von GreenAttack verwalteten Features neu einliest und die Slotänderung das Spielerlimit dieses einzelnen Backend-Servers aktualisiert.
 
@@ -82,6 +90,6 @@ Wenn eine Funktion in einem Feature-Config-Ordner geändert wurde, lädt `/green
 
 ## Bauen und installieren
 
-Zum Bauen des JAR-Plugins wird ein JDK benötigt, und unter Windows kann der Build im Hauptordner des Repositorys mit `.\gradlew.bat jar sourcesJar` ausgeführt werden; die JAR-Datei wird danach unter `lib/GreenAttack-System-3.6.jar` abgelegt.
+Zum Bauen des JAR-Plugins wird ein JDK benötigt, und unter Windows kann der Build im Hauptordner des Repositorys mit `.\gradlew.bat jar sourcesJar` ausgeführt werden; die JAR-Datei wird danach unter `lib/GreenAttack-System-3.8.jar` abgelegt.
 
 Das Quellcode-Archiv soll zusammen mit den Gradle-Dateien und dem kompletten `src`-Ordner verteilt werden, damit das Projekt ohne Dekompilierung geöffnet und verändert werden kann; für Paper 1.21.11 wird Java 21 benötigt, während neuere Paper-Versionen ihre jeweils unterstützte Server-Java-Version voraussetzen.

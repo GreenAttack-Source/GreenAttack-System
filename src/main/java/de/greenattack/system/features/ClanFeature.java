@@ -65,6 +65,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
    private static final String CONNECT_CHANNEL = "greenattack:home_connect";
    private static final int CLAN_SUFFIX_PRIORITY = 0;
    private static final long DELETE_CONFIRM_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(60L);
+   private final Map<String, PendingAdminDisband> pendingAdminDisbands = new ConcurrentHashMap<>();
 
    static final Map<String, String> NAMED_COLORS = new java.util.LinkedHashMap<>();
 
@@ -134,7 +135,10 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
       }
    }
 
-   private record PendingDeleteConfirmation(String clanKey, long expiresAt) {
+   private record PendingDeleteConfirmation(String clanKey, long clanCreatedAt, long expiresAt) {
+   }
+
+   private record PendingAdminDisband(String clanKey, String clanName, long clanCreatedAt, long expiresAt) {
    }
 
    static final class Res {
@@ -239,7 +243,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          changed = true;
       }
       if (this.config.getString("messages.usage-admin", "").toLowerCase(Locale.ROOT).contains("verify")) {
-         this.config.set("messages.usage-admin", "&7Verwendung: &f/clanadmin <disband <Clan> | kick <Spieler> | settag <Clan> <Tag> | setcolor <Clan> <Farbe>>");
+         this.config.set("messages.usage-admin", "&7Verwendung: &f/clanadmin <disband <Clan> [confirm] | kick <Spieler> | settag <Clan> <Tag> | setcolor <Clan> <Farbe>>");
          changed = true;
       }
       if (this.config.getString("messages.info-status", "").contains("%status%")) {
@@ -485,8 +489,40 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
       return Math.max(0, this.config.getInt("max-homes", 3));
    }
 
-   long colorCost(String stored) {
-      return Math.max(0L, stored.startsWith("#") ? this.config.getLong("color-cost-hex", 250L) : this.config.getLong("color-cost-normal", 100L));
+   double colorCost(String stored) {
+      String path = isHexColor(stored) ? "color-cost-hex" : "color-cost-normal";
+      Object configured = this.config.get(path, "free");
+      String value = String.valueOf(configured).trim();
+      if (value.equalsIgnoreCase("free")) {
+         return 0D;
+      }
+      try {
+         double amount = Double.parseDouble(value);
+         if (Double.isFinite(amount)) {
+            return Math.max(0D, amount);
+         }
+      } catch (NumberFormatException ignored) {
+         // Ungueltige Konfiguration wird unten als kostenlos behandelt.
+      }
+      this.plugin.getLogger().warning("Ungueltiger Wert fuer features/clans/config.yml " + path + ": '" + value + "'. Verwende free.");
+      return 0D;
+   }
+
+   String colorCostLabel(String stored) {
+      double amount = this.colorCost(stored);
+      if (amount <= 0D) {
+         return "Kostenlos";
+      }
+      if (this.colorCurrency().equals("crystals")) {
+         return Long.toString((long) Math.ceil(amount)) + " Kristalle";
+      }
+      EconomyService economy = this.plugin.getEconomyService();
+      return economy == null ? this.formatCost(amount) + " Economy" : economy.format(amount);
+   }
+
+   private String colorCurrency() {
+      String configured = this.config.getString("color-currency", "crystals");
+      return "economy".equalsIgnoreCase(configured == null ? "" : configured.trim()) ? "economy" : "crystals";
    }
 
    String msg(String path, String fallback, String... pairs) {
@@ -533,7 +569,21 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
    }
 
    private String styledTag(ClanData clan) {
-      return legacyColor(clan.color) + ("bold".equals(clan.tagStyle) ? "§l" : "") + clan.tag.toUpperCase(Locale.ROOT);
+      String tag = clan.tag.toUpperCase(Locale.ROOT);
+      boolean bold = "bold".equals(clan.tagStyle);
+      if (!isGradientColor(clan.color)) {
+         return legacyColor(clan.color) + (bold ? "§l" : "") + tag;
+      }
+
+      StringBuilder result = new StringBuilder(tag.length() * 16);
+      for (int index = 0; index < tag.length(); index++) {
+         result.append(legacyHex(gradientColor(clan.color, index, tag.length())));
+         if (bold) {
+            result.append("§l");
+         }
+         result.append(tag.charAt(index));
+      }
+      return result.toString();
    }
 
    // ------------------------------------------------------------------ Befehle
@@ -653,10 +703,10 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
             break;
          case "color": {
             Player player = this.requirePlayer(sender);
-            if (player != null && this.requireArgs(sender, args, 2, "color <Farbe oder #RRGGBB>")) {
+            if (player != null && this.requireArgs(sender, args, 2, "color <Farbe | #RRGGBB | #RRGGBB:#RRGGBB>")) {
                String parsed = parseColor(args[1]);
                if (parsed == null) {
-                  this.tell(sender, "messages.invalid-color", "&cUnbekannte Farbe. Erlaubt sind Farbnamen wie pink, gold, aqua oder Hex wie #ff8800.");
+                  this.tell(sender, "messages.invalid-color", "&cErlaubt sind Farbnamen, #RRGGBB oder Verläufe wie #ff0000:#0000ff.");
                } else {
                   this.buyColor(player, parsed, null);
                }
@@ -827,7 +877,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
    }
 
    double creationCost() {
-      Object configured = this.config.get("create-cost", 250000);
+      Object configured = this.config.get("create-cost", "free");
       String value = String.valueOf(configured).trim();
       if (value.equalsIgnoreCase("free")) {
          return 0D;
@@ -842,8 +892,8 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          // Use the default below when the config contains neither "free" nor a number.
       }
 
-      this.plugin.getLogger().warning("Ungültiger Wert für features/clans/config.yml create-cost: '" + value + "'. Verwende 250000.");
-      return 250000D;
+      this.plugin.getLogger().warning("Ungültiger Wert für features/clans/config.yml create-cost: '" + value + "'. Verwende free.");
+      return 0D;
    }
 
    String creationCostLabel() {
@@ -1192,8 +1242,12 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
       UUID playerId = player.getUniqueId();
       if (args.length == 1) {
          ClanData clan = this.snapshot.clans.get(me.clanKey);
+         if (clan == null) {
+            this.tell(sender, "messages.clan-gone", "&cDen Clan &e%clan% &cgibt es nicht (mehr).", "clan", me.clanKey);
+            return;
+         }
          this.pendingDeleteConfirmations.put(playerId,
-            new PendingDeleteConfirmation(me.clanKey, System.currentTimeMillis() + DELETE_CONFIRM_TIMEOUT_MILLIS));
+            new PendingDeleteConfirmation(me.clanKey, clan.createdAt, System.currentTimeMillis() + DELETE_CONFIRM_TIMEOUT_MILLIS));
          this.tell(sender, "messages.delete-confirm",
             "&cBist du wirklich sicher, dass du den Clan &e%clan% &clöschen möchtest? Bestätige innerhalb von 60 Sekunden mit &f/clan confirm&c.",
             "clan", clan == null ? me.clanKey : clan.name);
@@ -1224,35 +1278,45 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
 
       UUID playerId = player.getUniqueId();
       PendingDeleteConfirmation pending = this.pendingDeleteConfirmations.remove(playerId);
+      ClanData currentClan = this.snapshot.clans.get(me.clanKey);
       boolean bypassExpiry = player.hasPermission(DELETE_CONFIRM_BYPASS_PERMISSION);
       if (pending == null || !pending.clanKey().equals(me.clanKey)
+         || currentClan == null || currentClan.createdAt != pending.clanCreatedAt()
          || (!bypassExpiry && pending.expiresAt() <= System.currentTimeMillis())) {
          this.tell(sender, "messages.delete-confirm-expired", "&cEs gibt keine gültige Löschbestätigung. Starte mit &f/clan delete&c.");
          return;
       }
-      this.disband(player);
+      this.disband(player, pending.clanKey(), pending.clanCreatedAt());
    }
 
-   void disband(Player player) {
+   private void disband(Player player, String expectedClanKey, long expectedCreatedAt) {
       final UUID id = player.getUniqueId();
       this.async(player, storage -> {
          Snapshot fresh = storage.loadSnapshot();
          MemberData now = fresh.members.get(id);
-         if (now == null || !ClanModel.OWNER.equals(now.roleKey)) {
-            return new Res("NO_RIGHTS", "", "");
+         if (now == null || !ClanModel.OWNER.equals(now.roleKey) || !expectedClanKey.equals(now.clanKey)) {
+            return new Res("DELETE_CONFIRM_INVALID", "", "");
          }
          ClanData clan = fresh.clans.get(now.clanKey);
          StringBuilder ids = new StringBuilder();
-         for (MemberData member : fresh.membersOf(now.clanKey)) {
-            ids.append(member.uuid).append(',');
+         List<UUID> removedMembers = storage.disbandOwnedClan(expectedClanKey, id, expectedCreatedAt);
+         if (removedMembers == null) {
+            return new Res("DELETE_CONFIRM_INVALID", "", "");
          }
-         storage.disband(now.clanKey);
+         for (UUID memberId : removedMembers) {
+            ids.append(memberId).append(',');
+         }
          this.publishSnapshot(storage.loadSnapshot());
          return new Res("OK", clan == null ? now.clanKey : clan.name, ids.toString());
       }, result -> {
+         if (result.status.equals("DELETE_CONFIRM_INVALID")) {
+            this.tell(player, "messages.delete-confirm-expired", "&cEs gibt keine gültige Löschbestätigung. Starte mit &f/clan delete&c.");
+            return;
+         }
          if (this.commonError(player, result)) {
             return;
          }
+         this.plugin.getLogger().info("Clan wurde nach bestaetigtem Owner-Befehl aufgeloest: clan=" + expectedClanKey + ", owner=" + player.getUniqueId() + " (" + player.getName() + ").");
          String message = this.msg("messages.deleted", "&aDer Clan &e%clan% &awurde gelöscht.", "clan", result.a);
          for (String part : result.b.split(",")) {
             if (!part.isEmpty()) {
@@ -1828,35 +1892,56 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          return;
       }
 
-      KristallFeature kristall = this.plugin.getKristallFeature();
-      if (kristall == null || !kristall.isEnabled()) {
-         this.tell(player, "messages.kristall-missing", "&cDas Kristall-System ist nicht verfügbar.");
-         this.finish(after);
-         return;
-      }
-      final long cost = this.colorCost(parsed);
+      final double cost = this.colorCost(parsed);
+      final String costLabel = this.colorCostLabel(parsed);
       final UUID id = player.getUniqueId();
-      try {
-         if (!kristall.withdrawBalance(id, cost)) {
-            this.tell(player, "messages.not-enough-kristalle", "&cEine neue Tag-Farbe kostet &b%cost% Kristalle&c. Du hast &b%balance%&c.",
-               "cost", Long.toString(cost), "balance", Long.toString(kristall.getBalance(id)));
+      final Runnable refund;
+      if (cost <= 0D) {
+         refund = () -> {};
+      } else if (this.colorCurrency().equals("crystals")) {
+         KristallFeature kristall = this.plugin.getKristallFeature();
+         if (kristall == null || !kristall.isEnabled()) {
+            this.tell(player, "messages.kristall-missing", "&cDas Kristall-System ist nicht verfügbar.");
             this.finish(after);
             return;
          }
-      } catch (IOException exception) {
-         this.plugin.getLogger().severe("Kristallabbuchung für " + player.getName() + " fehlgeschlagen: " + exception.getMessage());
-         this.tell(player, "messages.kristall-save-failed", "&cDein Kristallkonto konnte nicht gespeichert werden.");
-         this.finish(after);
-         return;
+         final long crystalCost = (long) Math.ceil(cost);
+         try {
+            if (!kristall.withdrawBalance(id, crystalCost)) {
+               this.tell(player, "messages.not-enough-color-currency", "&cDie Tag-Farbe kostet &e%cost%&c. Dein Kontostand: &e%balance%&c.",
+                  "cost", costLabel, "balance", Long.toString(kristall.getBalance(id)) + " Kristalle");
+               this.finish(after);
+               return;
+            }
+         } catch (IOException exception) {
+            this.plugin.getLogger().severe("Kristallabbuchung für " + player.getName() + " fehlgeschlagen: " + exception.getMessage());
+            this.tell(player, "messages.kristall-save-failed", "&cDein Kristallkonto konnte nicht gespeichert werden.");
+            this.finish(after);
+            return;
+         }
+         refund = () -> {
+            try {
+               kristall.depositBalance(id, crystalCost);
+            } catch (IOException exception) {
+               this.plugin.getLogger().severe("Kristallerstattung für " + id + " fehlgeschlagen (" + crystalCost + "): " + exception.getMessage() + ". Bitte Konto manuell prüfen.");
+            }
+         };
+      } else {
+         EconomyService economy = this.plugin.getEconomyService();
+         if (economy == null) {
+            this.tell(player, "messages.economy-missing", "&cDas Wirtschaftssystem ist nicht verfügbar.");
+            this.finish(after);
+            return;
+         }
+         if (!economy.has(player, cost) || !economy.withdraw(player, cost)) {
+            this.tell(player, "messages.not-enough-color-currency", "&cDie Tag-Farbe kostet &e%cost%&c. Dein Kontostand: &e%balance%&c.",
+               "cost", costLabel, "balance", economy.format(economy.balance(player)));
+            this.finish(after);
+            return;
+         }
+         refund = () -> this.refundMoney(player, cost);
       }
 
-      final Runnable refund = () -> {
-         try {
-            kristall.depositBalance(id, cost);
-         } catch (IOException exception) {
-            this.plugin.getLogger().severe("Kristallerstattung für " + id + " fehlgeschlagen (" + cost + "): " + exception.getMessage() + ". Bitte Konto manuell prüfen.");
-         }
-      };
       this.async(player, storage -> {
          Snapshot fresh = storage.loadSnapshot();
          MemberData now = fresh.members.get(id);
@@ -1868,10 +1953,10 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          return new Res("OK", now.clanKey, "");
       }, result -> {
          if (result.status.equals("OK")) {
-            this.tell(player, "messages.color-done", "&aDie Tag-Farbe wurde geändert. &7(%cost% Kristalle)", "cost", Long.toString(cost));
+            this.tell(player, "messages.color-done", "&aDie Tag-Farbe wurde geändert. &7(%cost%)", "cost", costLabel);
          } else {
             refund.run();
-            this.tell(player, "messages.no-rights", "&cDazu hast du im Clan keine Rechte. Die Kristalle wurden erstattet.");
+            this.tell(player, "messages.no-rights", "&cDazu hast du im Clan keine Rechte. Die Kosten wurden erstattet.");
          }
          this.finish(after);
       }, () -> {
@@ -2300,15 +2385,18 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          this.tell(sender, "messages.no-permission", "&cDazu hast du keine Rechte.");
          return;
       }
-      final String usage = "&7Verwendung: &f/clanadmin <disband <Clan> | kick <Spieler> | settag <Clan> <Tag> | setcolor <Clan> <Farbe>>";
+      final String usage = "&7Verwendung: &f/clanadmin <disband <Clan> [confirm] | kick <Spieler> | settag <Clan> <Tag> | setcolor <Clan> <Farbe>>";
       if (args.length == 0) {
          this.tell(sender, "messages.usage-admin", usage);
          return;
       }
 
       final String sub = args[0].toLowerCase(Locale.ROOT);
+      if (sub.equals("disband")) {
+         this.handleAdminDisband(sender, args);
+         return;
+      }
       switch (sub) {
-         case "disband":
          case "kick":
          case "settag":
          case "setcolor":
@@ -2339,7 +2427,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
       } else if (sub.equals("setcolor")) {
          colorValue = parseColor(value);
          if (colorValue == null) {
-            this.tell(sender, "messages.invalid-color", "&cUnbekannte Farbe. Erlaubt sind Farbnamen wie pink, gold, aqua oder Hex wie #ff8800.");
+            this.tell(sender, "messages.invalid-color", "&cErlaubt sind Farbnamen, #RRGGBB oder Verläufe wie #ff0000:#0000ff.");
             return;
          }
       }
@@ -2359,14 +2447,10 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
             }
             ClanData memberClan = fresh.clans.get(member.clanKey);
             boolean owner = ClanModel.OWNER.equals(member.roleKey);
-            if (owner && fresh.membersOf(member.clanKey).size() > 1) {
+            if (owner) {
                return new Res("IS_OWNER", member.name, "");
             }
-            if (owner) {
-               storage.disband(member.clanKey);
-            } else {
-               storage.removeMember(member.uuid);
-            }
+            storage.removeMember(member.uuid);
             this.publishSnapshot(storage.loadSnapshot());
             return new Res("OK", member.name, memberClan == null ? member.clanKey : memberClan.name);
          }
@@ -2376,9 +2460,6 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
             return new Res("UNKNOWN_CLAN", target, "");
          }
          switch (sub) {
-            case "disband":
-               storage.disband(clan.key);
-               break;
             case "settag":
                if (!storage.setTag(clan.key, tagValue, tagValue.toLowerCase(Locale.ROOT))) {
                   return new Res("TAG_TAKEN", tagValue, "");
@@ -2396,7 +2477,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
                this.tell(sender, "messages.admin-no-member", "&cDer Spieler &e%player% &cist in keinem Clan.", "player", result.a);
                break;
             case "IS_OWNER":
-               this.tell(sender, "messages.admin-is-owner", "&e%player% &cist Owner eines Clans mit weiteren Mitgliedern. Löse den Clan mit &f/clanadmin disband &cauf.", "player", result.a);
+               this.tell(sender, "messages.admin-is-owner", "&e%player% &cist Clan-Owner und kann nicht gekickt werden. Nutze zum Auflösen &f/clanadmin disband <Clan>&c und bestätige danach.", "player", result.a);
                break;
             case "TAG_TAKEN":
                this.tell(sender, "messages.tag-taken-free", "&cDen Tag &e%tag% &cgibt es bereits.", "tag", result.a);
@@ -2405,12 +2486,66 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
                this.tell(sender, "messages.unknown-clan", "&cDen Clan &e%clan% &cgibt es nicht.", "clan", result.a);
                break;
             default: {
-               String fallback = sub.equals("disband") ? "&aDer Clan &e%clan% &awurde aufgelöst."
-                  : sub.equals("kick") ? "&e%player% &awurde aus dem Clan &e%value% &aentfernt."
+               String fallback = sub.equals("kick") ? "&e%player% &awurde aus dem Clan &e%value% &aentfernt."
                   : sub.equals("settag") ? "&aDer Tag von &e%clan% &awurde geändert: &f%value%" : "&aDie Tag-Farbe von &e%clan% &awurde geändert.";
                this.tell(sender, "messages.admin-" + sub, fallback, "clan", result.a, "player", result.a, "value", result.b);
                break;
             }
+         }
+      });
+   }
+
+   private void handleAdminDisband(CommandSender sender, String[] args) {
+      String senderKey = sender instanceof Player player ? player.getUniqueId().toString() : "console:" + sender.getName();
+      if (args.length == 2) {
+         ClanData clan = null;
+         for (ClanData candidate : this.snapshot.clans.values()) {
+            if (candidate.name.equalsIgnoreCase(args[1]) || candidate.key.equalsIgnoreCase(args[1])) {
+               clan = candidate;
+               break;
+            }
+         }
+         if (clan == null) {
+            this.tell(sender, "messages.unknown-clan", "&cDen Clan &e%clan% &cgibt es nicht.", "clan", args[1]);
+            return;
+         }
+         this.pendingAdminDisbands.put(senderKey, new PendingAdminDisband(clan.key, clan.name, clan.createdAt,
+            System.currentTimeMillis() + DELETE_CONFIRM_TIMEOUT_MILLIS));
+         this.tell(sender, "messages.admin-disband-confirm",
+            "&cClan &e%clan% &cwird aufgelöst. Bestätige innerhalb von 60 Sekunden mit &f/clanadmin disband %clan% confirm&c.",
+            "clan", clan.name);
+         return;
+      }
+      if (args.length != 3 || !args[2].equalsIgnoreCase("confirm")) {
+         this.tell(sender, "messages.usage-admin", "&7Verwendung: &f/clanadmin <disband <Clan> [confirm] | kick <Spieler> | settag <Clan> <Tag> | setcolor <Clan> <Farbe>>");
+         return;
+      }
+
+      PendingAdminDisband pending = this.pendingAdminDisbands.remove(senderKey);
+      if (pending == null || !pending.clanName().equalsIgnoreCase(args[1])
+         || pending.expiresAt() <= System.currentTimeMillis()) {
+         this.tell(sender, "messages.admin-disband-expired", "&cKeine aktive Auflösungsbestätigung. Starte mit &f/clanadmin disband <Clan>&c.");
+         return;
+      }
+      this.async(sender, storage -> {
+         Snapshot fresh = storage.loadSnapshot();
+         ClanData clan = fresh.clans.get(pending.clanKey());
+         if (clan == null || clan.createdAt != pending.clanCreatedAt() || !clan.name.equalsIgnoreCase(pending.clanName())) {
+            return new Res("UNKNOWN_CLAN", pending.clanName(), "");
+         }
+         if (!storage.disbandConfirmed(pending.clanKey(), pending.clanCreatedAt())) {
+            return new Res("UNKNOWN_CLAN", pending.clanName(), "");
+         }
+         this.publishSnapshot(storage.loadSnapshot());
+         return new Res("OK", clan.name, "");
+      }, result -> {
+         if (result.status.equals("OK")) {
+            this.plugin.getLogger().info("Clan wurde durch bestaetigten Admin-Befehl aufgeloest: clan=" + pending.clanKey() + ", ausgeloest von=" + sender.getName() + ".");
+            this.tell(sender, "messages.admin-disband", "&aDer Clan &e%clan% &awurde aufgelöst.", "clan", result.a);
+         } else if (result.status.equals("UNKNOWN_CLAN")) {
+            this.tell(sender, "messages.unknown-clan", "&cDen Clan &e%clan% &cgibt es nicht mehr.", "clan", result.a);
+         } else {
+            this.commonError(sender, result);
          }
       });
    }
@@ -2479,7 +2614,7 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          case "hex": {
             String parsed = parseColor(text);
             if (parsed == null) {
-               this.tell(player, "messages.invalid-color", "&cUnbekannte Farbe. Erlaubt sind Farbnamen wie pink, gold, aqua oder Hex wie #ff8800.");
+               this.tell(player, "messages.invalid-color", "&cErlaubt sind Farbnamen, #RRGGBB oder Verläufe wie #ff0000:#0000ff.");
             } else {
                this.buyColor(player, parsed, () -> this.reopen(ui, player, "colors"));
             }
@@ -2538,6 +2673,13 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
          } else if (args.length == 2) {
             for (ClanData clan : current.clans.values()) {
                options.add(clan.name);
+            }
+         } else if (args.length == 3 && args[0].equalsIgnoreCase("disband")) {
+            String senderKey = sender instanceof Player player ? player.getUniqueId().toString() : "console:" + sender.getName();
+            PendingAdminDisband pending = this.pendingAdminDisbands.get(senderKey);
+            if (pending != null && pending.clanName().equalsIgnoreCase(args[1])
+               && pending.expiresAt() > System.currentTimeMillis()) {
+               options.add("confirm");
             }
          } else if (args.length == 3 && args[0].equalsIgnoreCase("setcolor")) {
             options.addAll(NAMED_COLORS.keySet());
@@ -2644,13 +2786,13 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
 
    // ------------------------------------------------------------------ Hilfsmethoden
 
-   /** Liefert die gespeicherte Form (&d oder #rrggbb) oder null, wenn die Farbe unbekannt ist. */
+   /** Liefert einen Farbcode oder Farbverlauf wie #ff0000:#0000ff normalisiert. */
    static String parseColor(String input) {
       if (input == null) {
          return null;
       }
       String value = input.trim().toLowerCase(Locale.ROOT);
-      if (value.matches("#[0-9a-f]{6}") || value.matches("&[0-9a-f]")) {
+      if (isHexColor(value) || value.matches("&[0-9a-f]")) {
          return value;
       }
       String code = NAMED_COLORS.get(value);
@@ -2658,17 +2800,54 @@ public final class ClanFeature extends FeatureModule implements CommandExecutor,
    }
 
    static String legacyColor(String stored) {
-      if (stored != null && stored.matches("#[0-9a-fA-F]{6}")) {
-         StringBuilder builder = new StringBuilder("§x");
-         for (char digit : stored.substring(1).toCharArray()) {
-            builder.append('§').append(Character.toLowerCase(digit));
-         }
-         return builder.toString();
+      if (stored != null && isHexColor(stored)) {
+         String first = stored.split(":", 2)[0];
+         return legacyHex(first);
       }
       if (stored != null && stored.matches("&[0-9a-fA-F]")) {
          return "§" + Character.toLowerCase(stored.charAt(1));
       }
       return "§d";
+   }
+
+   private static boolean isHexColor(String value) {
+      return value != null && (value.matches("#[0-9a-fA-F]{6}") || isGradientColor(value));
+   }
+
+   private static boolean isGradientColor(String value) {
+      return value != null && value.matches("#[0-9a-fA-F]{6}(?::#[0-9a-fA-F]{6}){1,4}");
+   }
+
+   private static String legacyHex(String hex) {
+      StringBuilder builder = new StringBuilder("§x");
+      for (char digit : hex.substring(1).toCharArray()) {
+         builder.append('§').append(Character.toLowerCase(digit));
+      }
+      return builder.toString();
+   }
+
+   private static String legacyHex(int rgb) {
+      return legacyHex(String.format(Locale.ROOT, "#%06x", rgb & 0xffffff));
+   }
+
+   private static int gradientColor(String gradient, int characterIndex, int textLength) {
+      String[] stops = gradient.split(":");
+      if (stops.length < 2 || textLength <= 1) {
+         return Integer.parseInt(stops[0].substring(1), 16);
+      }
+      double progress = (double) characterIndex / (double) (textLength - 1) * (stops.length - 1);
+      int segment = Math.min(stops.length - 2, (int) Math.floor(progress));
+      double local = progress - segment;
+      int start = Integer.parseInt(stops[segment].substring(1), 16);
+      int end = Integer.parseInt(stops[segment + 1].substring(1), 16);
+      int red = interpolateChannel(start >> 16 & 0xff, end >> 16 & 0xff, local);
+      int green = interpolateChannel(start >> 8 & 0xff, end >> 8 & 0xff, local);
+      int blue = interpolateChannel(start & 0xff, end & 0xff, local);
+      return red << 16 | green << 8 | blue;
+   }
+
+   private static int interpolateChannel(int start, int end, double progress) {
+      return (int) Math.round(start + (end - start) * progress);
    }
 
    private <T> void async(CommandSender sender, StorageTask<T> task, Consumer<T> done) {
